@@ -59,6 +59,7 @@ export default defineConfig(({ mode }) => {
         'vue',
         'pinia',
         'vuetify',
+        'vuetify/lib/components/*.mjs',
         'axios-mock-adapter',
         'radash',
         'vue-router',
