@@ -25,6 +25,7 @@ request.interceptors.request.use((config) => {
 
 request.interceptors.response.use(
   (config) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data, message, success } = config.data as ApiRes<any>;
     if (!success) {
       toast.error({ message });

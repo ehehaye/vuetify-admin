@@ -2,6 +2,7 @@ import {
   createRouter,
   createWebHashHistory,
   createWebHistory,
+  RouteRecordRaw,
 } from 'vue-router';
 import {
   LOGIN_ROUTE,
@@ -11,7 +12,6 @@ import {
 } from '@/config/routes';
 import { lazyImport } from './helper';
 import { uuid } from '@rthx/utils';
-import { RouteRecordRaw } from 'vue-router';
 
 const isHash = import.meta.env.VITE_ROUTER_HISTORY === 'hash';
 

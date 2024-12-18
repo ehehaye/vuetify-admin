@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 type Fn<T> = (...args: any[]) => Promise<T>;
 
 export const usePromiseFn = <T = any>(fn: Fn<T>, defaultResult?: T) => {
