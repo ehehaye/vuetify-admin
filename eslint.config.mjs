@@ -1,3 +1,4 @@
+import js from "@eslint/js";
 import pluginVue from "eslint-plugin-vue";
 import importPlugin from "eslint-plugin-import";
 import { includeIgnoreFile } from "@eslint/compat";
@@ -13,6 +14,7 @@ const gitignorePath = path.resolve(__dirname, ".gitignore");
 
 export default [
   includeIgnoreFile(gitignorePath),
+  js.configs.recommended,
   importPlugin.flatConfigs.recommended,
   {
     settings: {

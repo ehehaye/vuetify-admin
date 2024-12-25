@@ -51,6 +51,9 @@ importers:
       '@eslint/compat':
         specifier: ^1.2.4
         version: 1.2.4(eslint@9.17.0)
+      '@eslint/js':
+        specifier: ^9.17.0
+        version: 9.17.0
       '@types/node':
         specifier: ^20.12.7
         version: 20.12.7
@@ -78,9 +81,6 @@ importers:
       eslint:
         specifier: 9.17.0
         version: 9.17.0
-      eslint-config-airbnb-base:
-        specifier: ^15.0.0
-        version: 15.0.0(eslint-plugin-import@2.31.0)(eslint@9.17.0)
       eslint-import-resolver-typescript:
         specifier: ^3.7.0
         version: 3.7.0(eslint-plugin-import@2.31.0)(eslint@9.17.0)
@@ -1081,9 +1081,6 @@ packages:
   confbox@0.1.7:
     resolution: {integrity: sha512-uJcB/FKZtBMCJpK8MQji6bJHgu1tixKPxRLeGkNzBoOZzpnZUJm0jm2/sBDWcuBx1dYgxV4JU+g5hmNxCyAmdA==}
 
-  confusing-browser-globals@1.0.11:
-    resolution: {integrity: sha512-JsPKdmh8ZkmnHxDk55FZ1TqVLvEQTvoByJZRN9jzI0UjxK/QgAmsphz7PGtqgPieQZ/CQcHWXCR7ATDNhGe+YA==}
-
   convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
 
@@ -1240,13 +1237,6 @@ packages:
   escape-string-regexp@5.0.0:
     resolution: {integrity: sha512-/veY75JbMK4j1yjvuUxuVsiS/hr/4iHs9FTT6cgTexxdE0Ly/glccBAkloH/DofkjRbZU3bnoj38mOmhkZ0lHw==}
     engines: {node: '>=12'}
-
-  eslint-config-airbnb-base@15.0.0:
-    resolution: {integrity: sha512-xaX3z4ZZIcFLvh2oUNvcX5oEofXda7giYmuplVxoOg5A7EXJMrUyqRgR+mhDhPK8LZ4PttFOBvCYDbX3sUoUig==}
-    engines: {node: ^10.12.0 || >=12.0.0}
-    peerDependencies:
-      eslint: ^7.32.0 || ^8.2.0
-      eslint-plugin-import: ^2.25.2
 
   eslint-config-prettier@9.1.0:
     resolution: {integrity: sha512-NSWl5BFQWEPi1j4TjVNItzYV7dZXZ+wP6I6ZhrBGpChQhZRUaElihE9uRRkcbRnNb76UMKDF3r+WTmNcGPKsqw==}
@@ -1865,10 +1855,6 @@ packages:
     resolution: {integrity: sha512-byy+U7gp+FVwmyzKPYhW2h5l3crpmGsxl7X2s8y43IgxvG4g3QZ6CffDtsNQy1WsmZpQbO+ybo0AlW7TY6DcBQ==}
     engines: {node: '>= 0.4'}
 
-  object.entries@1.1.8:
-    resolution: {integrity: sha512-cmopxi8VwRIAw/fkijJohSfpef5PdN0pMQJN6VC/ZKvn0LIknWD8KtgY6KlQdEc4tIjcQ3HxSMmnvtzIscdaYQ==}
-    engines: {node: '>= 0.4'}
-
   object.fromentries@2.0.8:
     resolution: {integrity: sha512-k6E21FzySsSK5a21KRADBd/NGneRegFO5pLHfdQLpRDETUNJueLXs3WCzyQ3tFRDYgbq3KHGXfTbi2bs8WQ6rQ==}
     engines: {node: '>= 0.4'}
@@ -2230,10 +2216,6 @@ packages:
   side-channel@1.1.0:
     resolution: {integrity: sha512-ZX99e6tRweoUXqR+VBrslhda51Nh5MTQwou5tnUDgbtyM0dBgmhEDtWGP/xbKn6hqfPRHujUNwz5fy/wbbhnpw==}
     engines: {node: '>= 0.4'}
-
-  source-map-js@1.2.0:
-    resolution: {integrity: sha512-itJW8lvSA0TXEphiRoawsCksnlf8SyvmFzIhltqAHluXd88pkCd+cXJVHTDwdCr0IzwptSm035IHQktUu1QUMg==}
-    engines: {node: '>=0.10.0'}
 
   source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
@@ -3597,8 +3579,6 @@ snapshots:
 
   confbox@0.1.7: {}
 
-  confusing-browser-globals@1.0.11: {}
-
   convert-source-map@2.0.0: {}
 
   cross-spawn@7.0.6:
@@ -3806,15 +3786,6 @@ snapshots:
   escape-string-regexp@4.0.0: {}
 
   escape-string-regexp@5.0.0: {}
-
-  eslint-config-airbnb-base@15.0.0(eslint-plugin-import@2.31.0)(eslint@9.17.0):
-    dependencies:
-      confusing-browser-globals: 1.0.11
-      eslint: 9.17.0
-      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.18.1(eslint@9.17.0)(typescript@5.4.5))(eslint-import-resolver-typescript@3.7.0)(eslint@9.17.0)
-      object.assign: 4.1.5
-      object.entries: 1.1.8
-      semver: 6.3.1
 
   eslint-config-prettier@9.1.0(eslint@9.17.0):
     dependencies:
@@ -4446,12 +4417,6 @@ snapshots:
       has-symbols: 1.0.3
       object-keys: 1.1.1
 
-  object.entries@1.1.8:
-    dependencies:
-      call-bind: 1.0.7
-      define-properties: 1.2.1
-      es-object-atoms: 1.0.0
-
   object.fromentries@2.0.8:
     dependencies:
       call-bind: 1.0.8
@@ -4779,7 +4744,7 @@ snapshots:
     dependencies:
       chokidar: 3.6.0
       immutable: 4.3.5
-      source-map-js: 1.2.0
+      source-map-js: 1.2.1
     optional: true
 
   scule@1.3.0: {}
@@ -4837,9 +4802,6 @@ snapshots:
       side-channel-list: 1.0.0
       side-channel-map: 1.0.1
       side-channel-weakmap: 1.0.2
-
-  source-map-js@1.2.0:
-    optional: true
 
   source-map-js@1.2.1: {}
 
