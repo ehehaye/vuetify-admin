@@ -55,15 +55,9 @@ export default defineConfig(({ mode }) => {
         : []),
     ],
     optimizeDeps: {
-      include: [
-        'vue',
-        'pinia',
-        'vuetify',
-        'vuetify/lib/components/*.mjs',
-        'axios-mock-adapter',
-        'radash',
-        'vue-router',
-      ],
+      include: ['vue', 'pinia', 'axios-mock-adapter', 'radash', 'vue-router'],
+      // https://stackoverflow.com/questions/75469067/vite-cypress-how-to-prevent-reloading-due-to-optimized-dependencies-causin
+      exclude: ['vuetify'],
       entries: ['./src/**/*.vue'],
     },
     resolve: {
