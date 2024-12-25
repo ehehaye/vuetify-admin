@@ -69,6 +69,7 @@ export default defineConfig(({ mode }) => {
     css: {
       preprocessorOptions: {
         scss: {
+          api: 'modern-compiler',
           additionalData: `$material-design-icons-font-directory-path: '${process.env.VITE_MD_ICON_FONT_DIR}';`,
         },
       },

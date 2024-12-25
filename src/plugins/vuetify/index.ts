@@ -1,6 +1,6 @@
 import 'vuetify/styles';
 import { createVuetify } from 'vuetify';
-import 'material-design-icons-iconfont/src/material-design-icons.scss';
+import 'material-design-icons-iconfont';
 import { aliases, md } from 'vuetify/iconsets/md';
 import { zhHans } from 'vuetify/locale';
 import * as labs from 'vuetify/labs/components';
