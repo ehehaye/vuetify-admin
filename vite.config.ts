@@ -1,5 +1,5 @@
 import vue from '@vitejs/plugin-vue';
-import { defineConfig, loadEnv, UserConfig } from 'vite';
+import { defineConfig, loadEnv, type UserConfig } from 'vite';
 import { cdn } from 'vite-plugin-cdn2';
 import viteCompression from 'vite-plugin-compression';
 import { visualizer } from 'rollup-plugin-visualizer';
@@ -69,6 +69,7 @@ export default defineConfig(({ mode }) => {
     css: {
       preprocessorOptions: {
         scss: {
+          // https://vuetifyjs.com/zh-Hans/features/sass-variables/#section-67845efa602780fd
           api: 'modern-compiler',
           additionalData: `$material-design-icons-font-directory-path: '${process.env.VITE_MD_ICON_FONT_DIR}';`,
         },
