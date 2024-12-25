@@ -1,6 +1,5 @@
 import vue from '@vitejs/plugin-vue';
 import { defineConfig, loadEnv, type UserConfig } from 'vite';
-import { cdn } from 'vite-plugin-cdn2';
 import viteCompression from 'vite-plugin-compression';
 import { visualizer } from 'rollup-plugin-visualizer';
 import vuetify from 'vite-plugin-vuetify';
@@ -39,10 +38,6 @@ export default defineConfig(({ mode }) => {
       }),
       ...(isProd
         ? [
-            // https://github.com/MMF-FE/vite-plugin-cdn-import/issues/13#issuecomment-1647523134
-            cdn({
-              modules: ['vue', 'vue-demi', 'pinia', 'vue-router'],
-            }),
             viteCompression(),
             visualizer({
               template: 'treemap', // or sunburst
@@ -78,6 +73,20 @@ export default defineConfig(({ mode }) => {
     esbuild: {
       jsxFactory: 'h',
       jsxFragment: 'Fragment',
+    },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            const libs = ['axios', 'vuetify'];
+            for (const lib of libs) {
+              if (id.includes(`node_modules/${lib}/`)) {
+                return lib;
+              }
+            }
+          },
+        },
+      },
     },
   } as UserConfig;
 });
