@@ -339,7 +339,7 @@ export default {
 
   // !------------------------ L i f e   c i r c l e --------------------------------------------------------
   mounted() {
-    this.inputId = this.id || this.gengerateID();
+    this.inputId = this.id || this.generateID();
 
     if (this.imgSrc) {
       this.dataUrl = this.imgSrc;
@@ -388,14 +388,14 @@ export default {
       });
     },
 
-    gengerateID() {
-      let nonstr = Math.random()
+    generateID() {
+      let uuid = Math.random()
         .toString(36)
         .substring(3, 8);
-      if (!document.getElementById(nonstr)) {
-        return nonstr;
+      if (!document.getElementById(uuid)) {
+        return uuid;
       } else {
-        return this.gengerateID();
+        return this.generateID();
       }
     },
 
@@ -529,19 +529,19 @@ export default {
 
   // !------------------------ W a t c h --------------------------------------------------------
   watch: {
-    imgSrc(newval) {
-      this.dataUrl = newval;
+    imgSrc(newVal) {
+      this.dataUrl = newVal;
 
-      if (!newval) {
+      if (!newVal) {
         this.file = null;
         this.errText = "";
         this.fileName = "";
       }
     },
 
-    value(newval, oldval) {
+    value(newVal, oldVal) {
       // reset
-      if (oldval && !newval) {
+      if (oldVal && !newVal) {
         this.reset();
       }
     }
