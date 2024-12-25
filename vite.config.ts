@@ -17,6 +17,15 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [
+      {
+        name: 'md-icon-inject',
+        transformIndexHtml(html) {
+          return html.replace(
+            /<link rel="stylesheet" href="md-icons-to-be-replaced">/,
+            `<link rel="stylesheet" href="${process.env.VITE_MD_ICON_HREF}">`,
+          );
+        },
+      },
       AutoImport({
         imports: ['vue', 'vue-router', 'pinia'],
         dts: './auto-imports.d.ts',
@@ -66,7 +75,6 @@ export default defineConfig(({ mode }) => {
         scss: {
           // https://vuetifyjs.com/zh-Hans/features/sass-variables/#section-67845efa602780fd
           api: 'modern-compiler',
-          additionalData: `$material-design-icons-font-directory-path: '${process.env.VITE_MD_ICON_FONT_DIR}';`,
         },
       },
     },
