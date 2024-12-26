@@ -21,6 +21,7 @@
     "preview": "vite preview",
     "lint": "eslint",
     "lint:fix": "pnpm lint --fix",
+    "test": "echo 'Tests are not prepared.'",
     "prepare": "husky"
   },
   "dependencies": {

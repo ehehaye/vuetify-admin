@@ -12,14 +12,12 @@ pool:
 steps:
 - task: NodeTool@0
   inputs:
-    versionSpec: '18.x'
+    versionSpec: '20.12.2'
   displayName: 'Install Node.js'
 
 - script: |
     npm install -g pnpm
     pnpm install
-    pnpm build
-    tar zcvf dist.tar.gz dist
   displayName: 'PNPM install'
 
 - script: |
