@@ -50,6 +50,7 @@ const placeholderIcon = 'description';
           :height="48"
           :title="props.title"
           :to="props.value"
+          :active="opened.includes(props.value)"
         >
           <template #prepend>
             <v-icon>{{ props.icon || placeholderIcon }}</v-icon>
