@@ -1,6 +1,6 @@
 import { Plugin } from 'vue';
 import Vue3AMap from '@rthx/vue3-amap';
-import '@rthx/vue3-amap/dist/style.css';
+import '@rthx/vue3-amap/dist/index.css';
 import toast from '@/utils/toast';
 
 const plugin: Plugin = function (app) {

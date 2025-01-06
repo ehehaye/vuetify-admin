@@ -27,7 +27,9 @@ export default defineConfig(({ mode }) => {
       }),
       vue(),
       vueJsx(),
-      vuetify(),
+      vuetify({
+        autoImport: { labs: true },
+      }),
       Components({
         globs: ['src/components/**/index.vue'],
         dts: './types/components.d.ts',
@@ -50,7 +52,16 @@ export default defineConfig(({ mode }) => {
         : []),
     ],
     optimizeDeps: {
-      include: ['vue', 'pinia', 'axios-mock-adapter', 'radash', 'vue-router'],
+      include: [
+        'vue',
+        'pinia',
+        'axios-mock-adapter',
+        'radash',
+        'vue-router',
+        'v-keep-scroll',
+        'nprogress',
+        '@rthx/vue3-amap',
+      ],
       // https://stackoverflow.com/questions/75469067/vite-cypress-how-to-prevent-reloading-due-to-optimized-dependencies-causin
       exclude: ['vuetify'],
       entries: ['./src/**/*.vue'],
