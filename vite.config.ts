@@ -17,15 +17,6 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [
-      {
-        name: 'md-icon-inject',
-        transformIndexHtml(html) {
-          return html.replace(
-            /<link rel="stylesheet" href="md-icons-to-be-replaced">/,
-            `<link rel="stylesheet" href="${process.env.VITE_MD_ICON_HREF}">`,
-          );
-        },
-      },
       AutoImport({
         imports: ['vue', 'vue-router', 'pinia'],
         dts: './auto-imports.d.ts',
