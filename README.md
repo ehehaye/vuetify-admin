@@ -35,7 +35,7 @@
 ## 开发模式
 
 ```bash
-git clone https://github.com/tanghongxin/vuetify-admin.git
+git clone https://github.com/ehehaye/vuetify-admin.git
 cd vuetify-admin
 pnpm i
 pnpm dev
