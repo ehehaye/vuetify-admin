@@ -6,7 +6,7 @@
 
 ## 在线尝试
 
-[Live Demo](https://vuetify.ado.icu)
+[Live Demo](https://vuetify.3mo.me)
 
 ## Features
 
