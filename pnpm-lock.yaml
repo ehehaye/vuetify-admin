@@ -30,8 +30,8 @@ importers:
         specifier: ^2.3.0
         version: 2.3.1(@vue/composition-api@1.7.2(vue@3.5.13(typescript@5.8.3)))(typescript@5.8.3)(vue@3.5.13(typescript@5.8.3))
       qs:
-        specifier: ^6.13.1
-        version: 6.14.0
+        specifier: ^6.14.1
+        version: 6.14.1
       radash:
         specifier: ^12.1.0
         version: 12.1.0
@@ -1958,8 +1958,8 @@ packages:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
 
-  qs@6.14.0:
-    resolution: {integrity: sha512-YWWTjgABSKcvs/nWBi9PycY/JiPJqOD4JA6o9Sej2AtvSGarXxKC3OQSk4pAarbdQlKAh5D4FCQkJNkW+GAn3w==}
+  qs@6.14.1:
+    resolution: {integrity: sha512-4EK3+xJl8Ts67nLYNwqw/dsFVnCf+qR7RgXSK9jEEm9unao3njwMDdmsdvoKBKHzxd7tCYz5e5M+SnMjdtXGQQ==}
     engines: {node: '>=0.6'}
 
   quansync@0.2.10:
@@ -4552,7 +4552,7 @@ snapshots:
 
   punycode@2.3.1: {}
 
-  qs@6.14.0:
+  qs@6.14.1:
     dependencies:
       side-channel: 1.1.0
 
