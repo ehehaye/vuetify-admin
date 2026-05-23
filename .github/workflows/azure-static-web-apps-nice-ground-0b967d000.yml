@@ -8,6 +8,7 @@ on:
     types: [opened, synchronize, reopened, closed]
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   build_and_deploy_job:
@@ -29,8 +30,9 @@ jobs:
           app_location: "/"
           output_location: "dist"
         env:
+          NODE_VERSION: '22.17.0'
           PRE_BUILD_COMMAND: npm install -g pnpm
-          CUSTOM_BUILD_COMMAND: pnpm install && pnpm run build
+          CUSTOM_BUILD_COMMAND: pnpm install --config.ignore-scripts=true && pnpm run build
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
