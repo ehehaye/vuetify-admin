@@ -15,7 +15,7 @@ defineOptions({ name: 'App' });
 let el = document.getElementById('app_spinner_wrapper');
 
 const removeSpinner = () => {
-  if (el) {
+  if (el && el.parentElement) {
     el.parentElement.removeChild(el);
     el = null;
   }
