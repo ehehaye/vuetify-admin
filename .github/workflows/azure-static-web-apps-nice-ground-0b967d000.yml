@@ -31,7 +31,7 @@ jobs:
           output_location: "dist"
         env:
           NODE_VERSION: '22.17.0'
-          PRE_BUILD_COMMAND: npm install -g pnpm
+          PRE_BUILD_COMMAND: npm install -g pnpm@10.30.1
           CUSTOM_BUILD_COMMAND: pnpm install --config.ignore-scripts=true && pnpm run build
 
   close_pull_request_job:
