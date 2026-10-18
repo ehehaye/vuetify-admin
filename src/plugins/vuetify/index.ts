@@ -56,6 +56,8 @@ const defaults = {
   VFileUpload: { rounded: 'lg' },
   VList: { density: 'comfortable', rounded: 'lg' },
   VListItem: { rounded: 'lg' },
+  // order 小于 AppBar，使抽屉排在布局顶部之前，从而忽略顶部偏移并撑满整个高度
+  VNavigationDrawer: { order: -1 },
   VChip: { rounded: 'lg' },
   VSnackbar: { rounded: 'lg' },
   VAlert: { rounded: 'lg', variant: 'tonal' },
