@@ -43,15 +43,13 @@ const ctxMenu = (e: MouseEvent, index: number) => {
       >
         <span class="subtitle-1">{{ r.name }}</span>
         <v-spacer tag="span" />
-        <v-btn
-          icon
-          ripple
-          small
+        <v-icon-btn
+          v-ripple
+          icon="close"
+          size="small"
           variant="text"
           @click.prevent="tagsViewStore.close(index)"
-        >
-          <v-icon small> close </v-icon>
-        </v-btn>
+        />
       </v-tab>
     </v-tabs>
     <v-divider />

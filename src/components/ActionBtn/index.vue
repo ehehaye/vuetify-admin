@@ -40,9 +40,13 @@ const color = computed(
 <template>
   <v-tooltip location="top" :text>
     <template v-slot:activator="{ props }">
-      <v-btn elevation="0" icon v-bind="props" @click="emit('click')">
-        <v-icon :color> {{ icon }} </v-icon>
-      </v-btn>
+      <v-icon-btn
+        :icon
+        :icon-color="color"
+        variant="text"
+        v-bind="props"
+        @click="emit('click')"
+      />
     </template>
   </v-tooltip>
 </template>

@@ -51,12 +51,22 @@ const repo = import.meta.env.VITE_GITHUB_REPO;
         <v-tooltip activator="parent" location="bottom"> 注销 </v-tooltip>
       </v-btn>
 
-      <v-btn icon color="white" @click="toggleSetting">
-        <v-icon size="20"> settings </v-icon>
+      <v-icon-btn
+        icon="settings"
+        icon-color="white"
+        variant="text"
+        @click="toggleSetting"
+      >
         <v-tooltip activator="parent" location="bottom"> 个性化设置 </v-tooltip>
-      </v-btn>
+      </v-icon-btn>
 
-      <v-btn icon color="white" :href="repo" target="_blank">
+      <v-icon-btn
+        tag="a"
+        :href="repo"
+        target="_blank"
+        variant="text"
+        class="tw:text-white"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"
@@ -74,7 +84,7 @@ const repo = import.meta.env.VITE_GITHUB_REPO;
           />
         </svg>
         <v-tooltip activator="parent" location="bottom"> Github </v-tooltip>
-      </v-btn>
+      </v-icon-btn>
     </template>
   </v-app-bar>
 </template>

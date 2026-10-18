@@ -10,7 +10,13 @@ defineOptions({
 const { menus: items } = storeToRefs(useAccountStore());
 const { permanentNavigation, navigation } = storeToRefs(useSettingStore());
 const { toggleNavigation } = useSettingStore();
-const opened = useOpenedMenus();
+const opened = ref<string[]>(useOpenedMenus().value);
+
+watch(useOpenedMenus(), (paths) => {
+  const next = new Set([...opened.value, ...paths]);
+  opened.value = [...next];
+});
+
 const placeholderIcon = 'description';
 </script>
 
@@ -32,15 +38,16 @@ const placeholderIcon = 'description';
       height="100%"
       collapse-icon=""
       expand-icon=""
-      :opened
+      open-on-click
+      v-model:opened="opened"
     >
       <template #prepend="{ item }">
         <v-icon>{{ item.meta.icon || placeholderIcon }}</v-icon>
       </template>
 
-      <template #append="{ isActive, item }">
+      <template #append="{ item }">
         <v-icon v-if="item.children?.length">{{
-          isActive ? 'expand_less' : 'expand_more'
+          opened.includes(item.path) ? 'expand_less' : 'expand_more'
         }}</v-icon>
       </template>
 

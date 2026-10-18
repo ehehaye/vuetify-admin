@@ -5,7 +5,7 @@ const items = useBreadcrumbs();
 </script>
 
 <template>
-  <v-breadcrumbs class="tw:pt-2 tw:pb-2 tw:hidden tw:sm:flex" :items>
+  <v-breadcrumbs class="tw:py-2 tw:my-0 tw:hidden tw:sm:flex" :items>
     <template #divider>
       <v-icon>forward</v-icon>
     </template>

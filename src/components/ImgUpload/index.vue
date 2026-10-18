@@ -34,62 +34,81 @@ const props = defineProps({
   },
 });
 
-const imgInputerRef = ref<IoGC<'ImgInputer'>>(null);
-const file = ref(null);
+const file = ref<File | null>(null);
+const previewUrl = ref(props.imgSrc);
 
 const maxMB = computed(() => props.maxSize / 1024);
 
-function handleExceedMaxSize() {
-  toast.error({ message: `图片大小超出${maxMB.value}兆` });
-  reset();
-}
+const rules = computed(() => [
+  (v: File | null) =>
+    !v || v.size <= props.maxSize * 1024 || `图片大小超出${maxMB.value}兆`,
+]);
 
-function handleFileChange(e) {
-  if (!/image/.test(e.type)) {
-    toast.error({ message: '上传文件非图片' });
-    reset();
+watch(file, (value) => {
+  if (previewUrl.value.startsWith('blob:')) {
+    URL.revokeObjectURL(previewUrl.value);
   }
+  previewUrl.value = value ? URL.createObjectURL(value) : props.imgSrc;
+});
+
+onBeforeUnmount(() => {
+  if (previewUrl.value.startsWith('blob:')) {
+    URL.revokeObjectURL(previewUrl.value);
+  }
+});
+
+function handleRejected() {
+  toast.error({ message: '上传文件非图片' });
 }
-
-function onUploadStart() {}
-
-function onUploadProgress() {}
-
-function onUploadSuccess() {}
-
-function onUploadError() {}
 
 function reset() {
   file.value = null;
-  imgInputerRef.value.reset();
-  imgInputerRef.value.$refs.inputer.value = '';
 }
 
 defineExpose({ reset });
 </script>
 
 <template>
-  <!-- auto-upload -->
-  <!-- action="//jsonplaceholder.typicode.com/posts/" -->
-  <ImgInputer
-    ref="imgInputerRef"
+  <v-file-upload
     v-model="file"
-    :class="{ 'tw:shadow-none': flat }"
-    icon="img"
     accept="image/*"
-    :img-src="imgSrc"
-    :max-size="maxSize"
-    :on-start="onUploadStart"
-    :on-progress="onUploadProgress"
-    :on-success="onUploadSuccess"
-    :on-error="onUploadError"
-    :no-hover-effect="readonly"
-    :placeholder="`${placeholder}（最大${maxMB}M）`"
+    filter-by-type="image/*"
+    inset-file-list
     :readonly="readonly"
-    readonly-tip-text=""
-    :size="size"
-    theme="material"
-    @on-exceed="handleExceedMaxSize"
-    @on-change="handleFileChange"
-  />
+    :rules="rules"
+    :density="size === 'small' ? 'compact' : 'default'"
+    :class="{ 'tw:shadow-none': flat }"
+    @rejected="handleRejected"
+  >
+    <template #title> {{ placeholder }}（最大{{ maxMB }}M） </template>
+
+    <template #single="{ props: itemProps }">
+      <div class="img-upload__preview">
+        <img v-if="previewUrl" :src="previewUrl" alt="" />
+        <v-icon-btn
+          v-if="!readonly"
+          icon="close"
+          size="small"
+          variant="text"
+          @click.stop="itemProps['onClick:remove']"
+        />
+      </div>
+    </template>
+  </v-file-upload>
 </template>
+
+<style lang="scss" scoped>
+.img-upload__preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px;
+
+  img {
+    max-width: 100%;
+    max-height: 200px;
+    object-fit: contain;
+  }
+}
+</style>

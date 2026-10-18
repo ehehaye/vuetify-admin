@@ -17,7 +17,15 @@ export const useSettingStore = defineStore('setting', () => {
   const tn = computed<ThemeName>(
     () => `${color.value}${dark.value ? '_dark' : '_light'}`,
   );
-  watch(tn, (name) => theme.change(name), { immediate: true });
+  let themeInitialized = false;
+  watch(
+    tn,
+    (name) => {
+      theme.change(name, themeInitialized ? { duration: '350ms' } : undefined);
+      themeInitialized = true;
+    },
+    { immediate: true },
+  );
 
   function setColor(c: Color) {
     color.value = c;

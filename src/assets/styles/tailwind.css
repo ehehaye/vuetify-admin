@@ -50,11 +50,6 @@
     flex: 1;
   }
 
-  .toast .v-snack {
-    position: fixed;
-    z-index: 9;
-  }
-
   .data-table .v-table--fixed-header thead tr {
     background-color: rgb(var(--v-theme-background));
   }

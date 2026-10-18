@@ -13,7 +13,6 @@ declare module 'vue' {
     DataTable: typeof import('./../src/components/DataTable/index.vue')['default']
     FollowMenu: typeof import('./../src/components/FollowMenu/index.vue')['default']
     FormDrawer: typeof import('./../src/components/FormDrawer/index.vue')['default']
-    ImgInputer: typeof import('./../src/components/ImgUpload/ImgInputer/index.vue')['default']
     ImgUpload: typeof import('./../src/components/ImgUpload/index.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

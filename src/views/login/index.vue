@@ -2,8 +2,12 @@
 import { useAccountStore } from '@/store/modules/account';
 import { LoginReq } from '@/api/account';
 import { usePromiseFn } from '@/composables';
+import { useRules } from 'vuetify';
 
 defineOptions({ name: 'Login' });
+
+const usernameRules = useRules(() => [['required', '请输入用户名']]);
+const passwordRules = useRules(() => [['required', '请输入密码']]);
 
 const model = reactive<LoginReq>({
   username: 'Admin',
@@ -43,7 +47,7 @@ const submit = async () => {
                 label="用户名"
                 name="login"
                 prepend-icon="person"
-                :rules="[(v) => !!v || '请输入用户名']"
+                :rules="usernameRules"
                 type="text"
                 validate-on-blur
                 autocomplete="username"
@@ -55,7 +59,7 @@ const submit = async () => {
                 label="密码"
                 name="password"
                 prepend-icon="lock"
-                :rules="[(v) => !!v || '请输入密码']"
+                :rules="passwordRules"
                 type="password"
                 validate-on-blur
                 autocomplete="current-password"

@@ -1,5 +1,5 @@
 import 'vuetify/styles';
-import { createVuetify } from 'vuetify';
+import { createRulesPlugin, createVuetify } from 'vuetify';
 import { aliases, md } from 'vuetify/iconsets/md';
 import { zhHans } from 'vuetify/locale';
 import { Plugin } from 'vue';
@@ -34,6 +34,7 @@ const plugin: Plugin = function (app) {
   });
 
   app.use(vuetify);
+  app.use(createRulesPlugin({}, vuetify.locale));
 };
 
 export default plugin;

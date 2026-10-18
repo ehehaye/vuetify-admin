@@ -3,33 +3,12 @@ import event, { Payload } from './event';
 
 defineOptions({ name: 'Toast' });
 
-const timeoutId = ref<ReturnType<typeof setTimeout> | null>(null);
-const items = ref<Payload[]>([]);
+type QueueItem = { text: string; color: Payload['color']; timeout: number };
 
-const enqueue = () => {
-  const [{ id, timeout }] = items.value;
-  if (!timeoutId.value) {
-    timeoutId.value = setTimeout(dequeue, timeout, id);
-  }
-};
+const queue = ref<QueueItem[]>([]);
 
-const dequeue = (id: Payload['id']) => {
-  if (timeoutId.value) {
-    clearTimeout(timeoutId.value);
-    timeoutId.value = null;
-  }
-
-  const index = items.value.findIndex((i) => i.id === id);
-  items.value.splice(index, 1);
-
-  if (items.value.length) {
-    enqueue();
-  }
-};
-
-const addItem = (payload: Payload) => {
-  items.value.push(payload);
-  enqueue();
+const addItem = ({ message, color, timeout }: Payload) => {
+  queue.value.push({ text: message, color, timeout });
 };
 
 onMounted(() => {
@@ -42,39 +21,23 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="toast">
-    <v-fade-transition mode="out-in" group>
-      <!-- https://github.com/vuejs/vue/issues/8516#issuecomment-937505336 -->
-      <div v-for="(item, i) in items" v-show="i === 0" :key="item.id">
-        <v-snackbar
-          absolute
-          :color="item.color"
-          :timeout="item.timeout"
-          location="top"
-          :model-value="i === 0"
-        >
-          {{ item.message }}
-          <template #actions>
-            <v-btn
-              v-if="items.length > 1"
-              color="white"
-              variant="text"
-              @click="dequeue(item.id)"
-            >
-              下一条 （{{ items.length - 1 }} +）
-            </v-btn>
-            <v-btn
-              v-else
-              color="white"
-              variant="text"
-              icon
-              @click="dequeue(item.id)"
-            >
-              <v-icon>close</v-icon>
-            </v-btn>
-          </template>
-        </v-snackbar>
-      </div>
-    </v-fade-transition>
-  </div>
+  <v-snackbar-queue v-model="queue" location="top" :total-visible="1">
+    <template #actions="{ props }">
+      <v-btn
+        v-if="queue.length"
+        color="white"
+        variant="text"
+        @click="props.onClick"
+      >
+        下一条 （{{ queue.length }} +）
+      </v-btn>
+      <v-icon-btn
+        v-else
+        color="white"
+        icon="close"
+        variant="text"
+        @click="props.onClick"
+      />
+    </template>
+  </v-snackbar-queue>
 </template>

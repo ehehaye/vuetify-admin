@@ -3,10 +3,9 @@ import { sleep } from '@rthx/utils';
 
 defineOptions({ name: 'FollowMenu' });
 
-const wrapperRef = ref<Element>(null);
 const menu = ref<boolean>(false);
-const x = ref<string | number>(0);
-const y = ref<string | number>(0);
+const x = ref(0);
+const y = ref(0);
 
 const show = async (e: MouseEvent) => {
   e.preventDefault();
@@ -14,8 +13,8 @@ const show = async (e: MouseEvent) => {
     menu.value = false;
     await sleep(130);
   }
-  x.value = `${e.clientX}px`;
-  y.value = `${e.clientY}px`;
+  x.value = e.clientX;
+  y.value = e.clientY;
   menu.value = true;
 };
 
@@ -25,25 +24,13 @@ defineExpose({
 </script>
 
 <template>
-  <Teleport to="body">
-    <div ref="wrapperRef" class="FollowMenu">
-      <v-menu
-        v-model="menu"
-        :attach="wrapperRef"
-        location="end"
-        transition="scale-transition"
-      >
-        <slot />
-      </v-menu>
-    </div>
-  </Teleport>
+  <v-menu
+    v-model="menu"
+    :target="[x, y]"
+    location-strategy="connected"
+    location="bottom start"
+    transition="scale-transition"
+  >
+    <slot />
+  </v-menu>
 </template>
-
-<style lang="scss">
-.FollowMenu {
-  .v-overlay__content {
-    top: v-bind(y);
-    left: v-bind(x);
-  }
-}
-</style>

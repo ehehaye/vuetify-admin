@@ -6,8 +6,23 @@ import {
   ProjectInfo,
 } from '@/api/project';
 import toast from '@/utils/toast';
+import { useRules } from 'vuetify';
 
 defineOptions({ name: 'ProjectSchema' });
+
+const nameRules = useRules(() => [['required', '请输入项目名称']]);
+const typeRules = useRules(() => [['required', '请选择项目类型']]);
+const categoryRules = useRules(() => [['required', '请选择项目类别']]);
+const priceRules = useRules(() => [['required', '请输入展示价格']]);
+const timeRules = useRules(() => [['required', '请输入总时长']]);
+const percentRules = useRules(() => [['required', '请输入成本比例']]);
+const occupyRules = useRules(() => [
+  (v) => typeof v === 'boolean' || '请选择独享房间',
+]);
+const tagsRules = useRules(() => [
+  ['required', '请输入功效标签'],
+  ['maxLength', 12, '最多输入12个字符'],
+]);
 
 const emit = defineEmits<{
   (e: 'addSuccess'): void;
@@ -97,7 +112,7 @@ defineExpose({ open });
               v-model="model.name"
               variant="underlined"
               label="项目名称"
-              :rules="[(v) => !!v || '请输入项目名称']"
+              :rules="nameRules"
             />
           </v-col>
         </v-row>
@@ -107,14 +122,14 @@ defineExpose({ open });
               v-model="model.type"
               variant="underlined"
               :items="['拔罐', '推拿', '足疗']"
-              :rules="[(v) => !!v || '请选择项目类型']"
+              :rules="typeRules"
               label="项目类型"
             />
           </v-col>
           <v-col cols="6">
             <v-radio-group
               v-model="model.category"
-              :rules="[(v) => !!v || '请选择项目类别']"
+              :rules="categoryRules"
               label="项目类别"
               inline
             >
@@ -128,7 +143,7 @@ defineExpose({ open });
             <v-text-field
               v-model.number="model.price"
               variant="underlined"
-              :rules="[(v) => !!v || '请输入展示价格']"
+              :rules="priceRules"
               label="展示价格（¥）"
             />
           </v-col>
@@ -136,7 +151,7 @@ defineExpose({ open });
             <v-text-field
               v-model.number="model.time"
               variant="underlined"
-              :rules="[(v) => !!v || '请输入总时长']"
+              :rules="timeRules"
               label="分钟"
             />
           </v-col>
@@ -147,7 +162,7 @@ defineExpose({ open });
               v-model.number="model.percent"
               variant="underlined"
               type="number"
-              :rules="[(v) => !!v || '请输入成本比例']"
+              :rules="percentRules"
               label="成本比例（%）"
             />
           </v-col>
@@ -155,7 +170,7 @@ defineExpose({ open });
             <v-radio-group
               v-model="model.occupy"
               color="primary"
-              :rules="[(v) => typeof v === 'boolean' || '请选择独享房间']"
+              :rules="occupyRules"
               label="独享房间"
               inline
             >
@@ -171,10 +186,7 @@ defineExpose({ open });
               variant="underlined"
               counter="12"
               label="功效标签"
-              :rules="[
-                (v) => !!v || '请输入功效标签',
-                (v) => (v && v.length <= 12) || '最多输入12个字符',
-              ]"
+              :rules="tagsRules"
             />
           </v-col>
         </v-row>
