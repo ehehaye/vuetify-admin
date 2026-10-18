@@ -120,7 +120,7 @@ async function submit() {
 
     <section class="login-form">
       <div class="login-form__inner">
-        <div class="tw:mb-8 tw:flex tw:items-center tw:gap-3 d-lg-none">
+        <div class="tw:mb-8 d-flex align-center tw:gap-3 d-lg-none">
           <img src="/logo.svg" alt="" class="tw:h-10 tw:w-10" />
           <div>
             <div class="text-h6 tw:font-semibold">{{ appTitle }}</div>
