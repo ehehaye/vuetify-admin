@@ -1,12 +1,21 @@
 import Toast from './index.vue';
-import event, { Color, Payload } from './event';
-import { uuid } from '@rthx/utils';
+import event from './event';
+import type { Color, Payload } from './event';
+
+export type ToastOptions = {
+  message: string;
+  timeout?: number;
+};
 
 const add =
   (color: Color) =>
-  ({ message = '', timeout = 4000 }) => {
-    event.emit({ id: uuid(), message, color, timeout } as Payload);
-    return;
+  ({ message, timeout = 3500 }: ToastOptions) => {
+    event.emit({
+      id: crypto.randomUUID(),
+      message,
+      color,
+      timeout,
+    } satisfies Payload);
   };
 
 const toast = {
@@ -17,3 +26,4 @@ const toast = {
 };
 
 export { Toast, toast };
+export default toast;

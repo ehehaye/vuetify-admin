@@ -1,109 +1,182 @@
-<script setup lang="ts">
-import { usePromiseFn } from '@/composables';
-import { Res, Props, getDefaultRes } from './types';
-import TableFooter from './TableFooter.vue';
+<script setup lang="ts" generic="T">
+import type { DataTableHeader } from 'vuetify';
 
-defineOptions({
-  name: 'DataTable',
-});
+type ItemsPerPageOption = number | { value: number; title: string };
+
+interface Props {
+  headers: DataTableHeader<T>[];
+  loadDataFn: (req: TableReq) => Promise<TableRes<T>>;
+  params?: Record<string, unknown>;
+  itemsPerPage?: number;
+  itemsPerPageOptions?: ItemsPerPageOption[];
+  multiSort?: boolean;
+}
 
 const props = withDefaults(defineProps<Props>(), {
-  loadDataFn: () => Promise.resolve(getDefaultRes()),
-  headers: () => [],
+  params: () => ({}),
+  itemsPerPage: 25,
+  itemsPerPageOptions: () => [10, 25, 50, 100, { value: -1, title: '全部' }],
   multiSort: false,
 });
 
-const headers = computed(() =>
-  props.headers.map((item) => ({
-    ...item,
-    // 禁用 v-data-table-virtual 本地排序，而使用远程排序
-    sortRaw: () => {},
-    sort: () => {},
-  })),
+const RESERVED_SLOTS = new Set([
+  'search',
+  'actions',
+  'no-data',
+  'top',
+  'bottom',
+]);
+
+const slots = useSlots();
+const forwardedSlots = computed(() =>
+  Object.fromEntries(
+    Object.entries(slots).filter(([name]) => !RESERVED_SLOTS.has(name)),
+  ),
 );
 
-const formRef = ref<IoGC<'VForm'>>(null);
-const options = ref<TableReq>({
+const options = ref({
   page: 1,
-  itemsPerPage: 25,
-  sortBy: [],
-  groupBy: [],
+  itemsPerPage: props.itemsPerPage,
+  sortBy: [] as TableSortItem[],
 });
 
-const { loading, result, error, exec } = usePromiseFn<Res>(
-  props.loadDataFn,
-  getDefaultRes(),
-);
+const items = shallowRef<T[]>([]);
+const total = ref(0);
+const loading = ref(false);
+const error = shallowRef<Error | null>(null);
 
-onMounted(() => {
-  watch(options, fetch, { immediate: true, deep: true });
+let requestSequence = 0;
+
+const optionsKey = computed(() => JSON.stringify(options.value));
+
+const toRequest = (): TableReq => ({
+  page: options.value.page,
+  itemsPerPage: options.value.itemsPerPage,
+  sortBy: options.value.sortBy,
+  ...props.params,
 });
 
-async function fetch(ops = {}) {
-  await nextTick();
-  const { valid } = await formRef.value.validate();
-  if (valid) {
-    await exec(Object.assign({}, options.value, ops));
-    await scrollToTop();
+async function load() {
+  const sequence = ++requestSequence;
+  loading.value = true;
+  error.value = null;
+
+  try {
+    const result = await props.loadDataFn(toRequest());
+    if (sequence !== requestSequence) return;
+
+    // 删除末页最后一条数据后，回退到仍有内容的页码
+    if (!result.items.length && result.total > 0 && options.value.page > 1) {
+      options.value.page = Math.max(
+        1,
+        Math.ceil(result.total / options.value.itemsPerPage),
+      );
+      return;
+    }
+
+    items.value = result.items;
+    total.value = result.total;
+  } catch (cause) {
+    if (sequence !== requestSequence) return;
+    error.value = cause instanceof Error ? cause : new Error(String(cause));
+    items.value = [];
+    total.value = 0;
+  } finally {
+    if (sequence === requestSequence) {
+      loading.value = false;
+    }
   }
 }
 
-async function refresh(firstPage = false) {
-  if (firstPage && options.value.page !== 1) {
+function reload(resetPage = true) {
+  if (resetPage && options.value.page !== 1) {
     options.value.page = 1;
-  } else {
-    fetch(options.value);
+    return;
   }
+  void load();
 }
 
-function scrollToTop() {
-  const tableWrapper = document.querySelector('.v-table__wrapper');
-  tableWrapper.scroll({ top: 0, behavior: 'smooth' });
+function refresh(resetPage = false) {
+  reload(resetPage);
 }
 
-defineExpose({ refresh });
+watch(optionsKey, () => void load(), { immediate: true });
+
+defineExpose({ reload, refresh });
 </script>
 
 <template>
-  <div class="data-table tw:w-full tw:h-full tw:flex tw:flex-col">
-    <v-form
-      class="tw:mt-4 tw:mb-4"
-      ref="formRef"
-      @submit.prevent="refresh(true)"
+  <div
+    class="data-table tw:flex tw:h-full tw:min-h-0 tw:w-full tw:flex-col tw:gap-4"
+  >
+    <form
+      class="tw:flex tw:flex-wrap tw:items-center tw:gap-3"
+      @submit.prevent="reload()"
     >
-      <slot name="search" />
-
-      <div class="tw:flex tw:flex-row tw:pb-1 tw:px-2">
-        <slot name="actions" />
-        <v-spacer />
-        <v-btn class="tw:mr-2" variant="tonal" type="submit"> 查询 </v-btn>
-        <v-btn variant="tonal" @click="refresh()"> 刷新 </v-btn>
+      <div class="tw:min-w-[220px] tw:flex-1">
+        <slot name="search" />
       </div>
-    </v-form>
 
-    <div class="tw:grow tw:overflow-hidden">
-      <v-data-table-virtual
-        v-keep-scroll="['.v-table__wrapper']"
-        class="tw:shadow-none tw:w-full tw:h-full tw:flex tw:flex-col tw:overflow-x-hidden"
+      <div class="tw:flex tw:items-center tw:gap-2">
+        <slot name="actions" />
+        <v-btn color="primary" type="submit" prepend-icon="search">
+          查询
+        </v-btn>
+        <v-btn
+          icon="refresh"
+          variant="text"
+          :loading="loading"
+          aria-label="刷新"
+          @click="reload(false)"
+        />
+      </div>
+    </form>
+
+    <div
+      class="tw:min-h-0 tw:flex-1 tw:overflow-hidden tw:rounded-xl tw:border tw:border-outline/20"
+    >
+      <v-data-table-server
+        v-model:options="options"
+        class="tw:h-full"
+        :headers="headers"
+        :items="items"
+        :items-length="total"
+        :items-per-page-options="itemsPerPageOptions"
+        :loading="loading"
+        loading-text="加载中…"
+        :multi-sort="multiSort"
         fixed-header
         fixed-footer
-        :headers
-        :items="result.items"
-        :loading
-        loading-text="加载中"
-        :multi-sort="props.multiSort"
-        :no-data-text="error ? '加载失败' : loading ? '加载中' : '暂无数据'"
-        v-model:sort-by="options.sortBy"
-        v-model:group-by="options.groupBy"
+        hover
+        no-data-text="暂无数据"
       >
-        <template v-for="(_, slot) of $slots" #[slot]="scope">
-          <slot :name="slot" v-bind="scope" />
+        <template v-for="(_, slotName) in forwardedSlots" #[slotName]="scope">
+          <slot :name="slotName" v-bind="scope ?? {}" />
         </template>
 
-        <template #bottom>
-          <TableFooter :options :result />
+        <template #no-data>
+          <slot name="no-data">
+            <v-empty-state
+              v-if="error"
+              class="tw:py-10"
+              icon="cloud_off"
+              title="加载失败"
+              :text="error.message"
+            >
+              <template #actions>
+                <v-btn color="primary" @click="reload(false)">重新加载</v-btn>
+              </template>
+            </v-empty-state>
+            <v-empty-state
+              v-else
+              class="tw:py-10"
+              icon="inbox"
+              title="暂无数据"
+              text="调整筛选条件后再试试"
+            />
+          </slot>
         </template>
-      </v-data-table-virtual>
+      </v-data-table-server>
     </div>
   </div>
 </template>

@@ -2,69 +2,80 @@ import {
   createRouter,
   createWebHashHistory,
   createWebHistory,
-  RouteRecordRaw,
 } from 'vue-router';
+import type { RouteRecordRaw } from 'vue-router';
 import {
+  DEFAULT_ROUTE_PATH,
+  FALLBACK_ROUTE,
+  HOME_ROUTE,
   LOGIN_ROUTE,
   NOT_FOUND_ROUTE,
-  FALLBACK_ROUTE,
-  DEFAULT_ROUTE,
 } from '@/config/routes';
 import { lazyImport } from './helper';
-import { uuid } from '@rthx/utils';
 
-const isHash = import.meta.env.VITE_ROUTER_HISTORY === 'hash';
+const LAYOUT_ROUTE_NAME = 'layout';
 
 const router = createRouter({
-  routes: [LOGIN_ROUTE],
-  history: isHash ? createWebHashHistory() : createWebHistory(),
-});
-
-const buildRoutes = (routesConfig: RouteConfig[] = []) => {
-  router.getRoutes().forEach((route) => {
-    if (route.name !== LOGIN_ROUTE.name) {
-      router.removeRoute(route.name);
-    }
-  });
-
-  const cb = ({ component, meta, children, ...rest }: RouteConfig) => {
-    const wrapCompName = meta.isKeepAlive
-      ? `warp-for-keep-alive-${uuid()}`
-      : '';
-    return {
-      ...rest,
-      component: component ? lazyImport(component, wrapCompName) : '',
-      meta: Object.assign({}, meta, wrapCompName ? { wrapCompName } : {}),
-      children: children?.map(cb),
-    } as RouteRecordRaw;
-  };
-
-  if (routesConfig.length) {
-    router.addRoute({
-      name: Symbol('Layout'),
+  routes: [
+    LOGIN_ROUTE,
+    {
+      name: LAYOUT_ROUTE_NAME,
       path: '/',
       component: () => import('@/layout/AppPage.vue'),
-      redirect: DEFAULT_ROUTE.path,
-      children: [...routesConfig.map(cb), NOT_FOUND_ROUTE, FALLBACK_ROUTE],
+      redirect: DEFAULT_ROUTE_PATH,
+      children: [HOME_ROUTE, NOT_FOUND_ROUTE, FALLBACK_ROUTE],
+    },
+  ],
+  history:
+    import.meta.env.VITE_ROUTER_HISTORY === 'hash'
+      ? createWebHashHistory()
+      : createWebHistory(),
+});
+
+const menuRouteNames = new Set<string>();
+
+const toRouteRecord = (menu: RouteConfig): RouteRecordRaw | null => {
+  if (!menu.component) return null;
+
+  return {
+    name: menu.path,
+    path: menu.path,
+    component: lazyImport(menu.component, menu.path),
+    meta: {
+      title: menu.name,
+      icon: menu.meta?.icon,
+      keepAlive: menu.meta?.keepAlive ?? false,
+      hidden: menu.meta?.hidden ?? false,
+      permission: menu.meta?.permission,
+    },
+  };
+};
+
+/** 菜单中的分组节点仅用于导航展示，路由只注册可渲染的叶子节点 */
+const flattenMenus = (menus: RouteConfig[]): RouteRecordRaw[] =>
+  menus.flatMap((menu) => {
+    const record = toRouteRecord(menu);
+    return record ? [record] : flattenMenus(menu.children ?? []);
+  });
+
+const clearMenuRoutes = () => {
+  menuRouteNames.forEach((name) => router.removeRoute(name));
+  menuRouteNames.clear();
+};
+
+export const buildRoutes = (menus: RouteConfig[] = []) => {
+  clearMenuRoutes();
+
+  const staticPaths = new Set(router.getRoutes().map((route) => route.path));
+
+  flattenMenus(menus)
+    .filter((record) => !staticPaths.has(record.path))
+    .forEach((record) => {
+      router.addRoute(LAYOUT_ROUTE_NAME, record);
+      menuRouteNames.add(String(record.name));
     });
-  }
-
-  const { hash, pathname } = window.location;
-  const path = isHash ? hash.replace('#/', '') : pathname;
-  const matchedRoute = router.resolve(path);
-
-  router.push(
-    matchedRoute.name !== LOGIN_ROUTE.name ? matchedRoute.fullPath : '/',
-  );
 };
 
-const resetRouter = () => {
-  try {
-    buildRoutes();
-  } catch {
-    window.location.reload();
-  }
-};
+export const resetRouter = clearMenuRoutes;
 
 export default router;
-export { buildRoutes, resetRouter };

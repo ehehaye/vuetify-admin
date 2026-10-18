@@ -1,46 +1,68 @@
+import { useLocalStorage, useMediaQuery } from '@vueuse/core';
 import { useDisplay, useTheme } from 'vuetify';
-import { useLocalStorage } from '@vueuse/core';
-import { Color, ThemeName } from '@/config/theme';
+import { readStoredTheme, resolveThemeName } from '@/config/theme';
+import type { Color, ThemeMode } from '@/config/theme';
 
 export const useSettingStore = defineStore('setting', () => {
   const { xs, lgAndUp } = useDisplay();
-
-  const headerHeight = computed(() => (xs.value ? 48 : 56));
-  const navigation = ref(!!lgAndUp.value);
-  const permanentNavigation = useLocalStorage('permanentNavigation', true);
-  const color = useLocalStorage<Color>('color', 'indigo');
-  const dark = useLocalStorage('dark', false);
-  const setting = useLocalStorage('setting', false);
-  const tagsView = useLocalStorage('tagsView', true);
-
   const theme = useTheme();
-  const tn = computed<ThemeName>(
-    () => `${color.value}${dark.value ? '_dark' : '_light'}`,
+  const stored = readStoredTheme();
+
+  const headerHeight = computed(() => (xs.value ? 56 : 64));
+  const navigation = ref(lgAndUp.value);
+  const permanentNavigation = useLocalStorage('permanent-navigation', true);
+  const color = useLocalStorage<Color>('theme-color', stored.color);
+  const mode = useLocalStorage<ThemeMode>('theme-mode', stored.mode);
+  const setting = useLocalStorage('settings-open', false);
+  const tagsView = useLocalStorage('tags-view', true);
+
+  const systemDark = useMediaQuery('(prefers-color-scheme: dark)');
+  const isDark = computed(
+    () =>
+      mode.value === 'dark' || (mode.value === 'system' && systemDark.value),
   );
-  let themeInitialized = false;
+  const themeName = computed(() => resolveThemeName(color.value, mode.value));
+  const permanent = computed(() => permanentNavigation.value && lgAndUp.value);
+  const drawerOpen = computed(() => permanent.value || navigation.value);
+
   watch(
-    tn,
-    (name) => {
-      theme.change(name, themeInitialized ? { duration: '350ms' } : undefined);
-      themeInitialized = true;
+    themeName,
+    (name, previous) => {
+      theme.change(name, previous ? { duration: '300ms' } : undefined);
     },
     { immediate: true },
   );
 
-  function setColor(c: Color) {
-    color.value = c;
+  watch(lgAndUp, (value) => {
+    navigation.value = value;
+  });
+
+  function setColor(value: Color) {
+    color.value = value;
+  }
+
+  function setMode(value: ThemeMode) {
+    mode.value = value;
   }
 
   function toggleDark() {
-    dark.value = !dark.value;
+    mode.value = isDark.value ? 'light' : 'dark';
   }
 
   function toggleNavigation() {
     navigation.value = !navigation.value;
   }
 
+  function setNavigation(value: boolean) {
+    navigation.value = value;
+  }
+
   function togglePermanentNavigation() {
     permanentNavigation.value = !permanentNavigation.value;
+    // 桌面端切换为浮动导航时，保持抽屉状态与开关一致
+    if (lgAndUp.value) {
+      navigation.value = permanentNavigation.value;
+    }
   }
 
   function toggleSetting() {
@@ -51,19 +73,32 @@ export const useSettingStore = defineStore('setting', () => {
     tagsView.value = !tagsView.value;
   }
 
+  function closeNavigation() {
+    if (!permanent.value) {
+      navigation.value = false;
+    }
+  }
+
   return {
     headerHeight,
     navigation,
     permanentNavigation,
     color,
-    dark,
+    mode,
     setting,
     tagsView,
+    isDark,
+    themeName,
+    permanent,
+    drawerOpen,
     setColor,
+    setMode,
     toggleDark,
     toggleNavigation,
+    setNavigation,
     togglePermanentNavigation,
     toggleSetting,
     toggleTagsView,
+    closeNavigation,
   };
 });

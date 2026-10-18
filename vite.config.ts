@@ -1,50 +1,43 @@
+import { fileURLToPath, URL } from 'node:url';
 import vue from '@vitejs/plugin-vue';
-import { defineConfig, loadEnv, type UserConfig } from 'vite';
+import { defineConfig } from 'vite';
 import viteCompression from 'vite-plugin-compression';
 import { visualizer } from 'rollup-plugin-visualizer';
 import vuetify from 'vite-plugin-vuetify';
-import path from 'node:path';
-import eslint from 'vite-plugin-eslint';
 import { codeInspectorPlugin } from 'code-inspector-plugin';
-import vueJsx from '@vitejs/plugin-vue-jsx';
 import tailwindcss from '@tailwindcss/vite';
 import Components from 'unplugin-vue-components/vite';
 import AutoImport from 'unplugin-auto-import/vite';
 
 export default defineConfig(({ mode }) => {
-  process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
-
   const isProd = mode === 'production';
 
   return {
     plugins: [
       AutoImport({
         imports: ['vue', 'vue-router', 'pinia'],
-        dts: './auto-imports.d.ts',
-      }),
-      eslint({
-        cache: false,
-        exclude: ['**/node_modules/**', '**/dist/**'],
+        dts: './types/auto-imports.d.ts',
       }),
       vue(),
-      vueJsx(),
-      vuetify({
-        autoImport: { labs: true },
-      }),
+      vuetify({ autoImport: { labs: true } }),
       tailwindcss(),
       Components({
         globs: ['src/components/**/index.vue'],
         dts: './types/components.d.ts',
-        extensions: ['vue', 'tsx'],
+        extensions: ['vue'],
       }),
-      codeInspectorPlugin({
-        bundler: 'vite',
-      }),
+      ...(!isProd
+        ? [
+            codeInspectorPlugin({
+              bundler: 'vite',
+            }),
+          ]
+        : []),
       ...(isProd
         ? [
             viteCompression(),
             visualizer({
-              template: 'treemap', // or sunburst
+              template: 'treemap',
               open: false,
               gzipSize: true,
               brotliSize: true,
@@ -54,54 +47,37 @@ export default defineConfig(({ mode }) => {
         : []),
     ],
     optimizeDeps: {
-      include: [
-        'vue',
-        'pinia',
-        'axios-mock-adapter',
-        'radash',
-        'vue-router',
-        'v-keep-scroll',
-        'nprogress',
-        '@rthx/vue3-amap',
-        'vuetify/components/VOverlay',
-        'vuetify/components/VDialog',
-        'vuetify/components/VMenu',
-        'vuetify/components/VSelect',
-        'vuetify/components/VTooltip',
-      ],
-      entries: ['./src/**/*.vue'],
+      entries: ['./src/**/*.{vue,ts}'],
     },
     resolve: {
       extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue'],
       alias: {
-        '@': path.resolve(__dirname, '/src'),
+        '@': fileURLToPath(new URL('./src', import.meta.url)),
       },
     },
     css: {
       preprocessorOptions: {
         scss: {
-          // https://vuetifyjs.com/zh-Hans/features/sass-variables/#section-67845efa602780fd
           api: 'modern-compiler',
         },
       },
-    },
-    esbuild: {
-      jsxFactory: 'h',
-      jsxFragment: 'Fragment',
     },
     build: {
       rollupOptions: {
         output: {
           manualChunks(id) {
-            const libs = ['axios', 'vuetify'];
-            for (const lib of libs) {
-              if (id.includes(`node_modules/${lib}/`)) {
-                return lib;
-              }
+            if (id.includes('node_modules/vuetify/')) return 'vuetify';
+            if (
+              id.includes('node_modules/vue/') ||
+              id.includes('node_modules/vue-router/') ||
+              id.includes('node_modules/pinia/')
+            ) {
+              return 'vue';
             }
+            if (id.includes('node_modules/axios/')) return 'axios';
           },
         },
       },
     },
-  } as UserConfig;
+  };
 });

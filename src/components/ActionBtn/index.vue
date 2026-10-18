@@ -1,50 +1,33 @@
 <script setup lang="ts">
-defineOptions({
-  name: 'ActionBtn',
-});
+type ActionType = 'view' | 'edit' | 'delete';
 
-const props = defineProps<{
-  type: 'view' | 'edit' | 'delete';
-}>();
-
-const emit = defineEmits(['click']);
-
-const text = computed(
-  () =>
-    ({
-      view: '详情',
-      edit: '编辑',
-      delete: '删除',
-    })[props.type],
+const props = withDefaults(
+  defineProps<{ type: ActionType; disabled?: boolean }>(),
+  { disabled: false },
 );
 
-const icon = computed(
-  () =>
-    ({
-      view: 'remove_red_eye',
-      edit: 'edit',
-      delete: 'delete',
-    })[props.type],
-);
+const emit = defineEmits<{ click: [] }>();
 
-const color = computed(
-  () =>
-    ({
-      view: 'success darken-3',
-      edit: 'blue darken-3',
-      delete: 'red',
-    })[props.type],
-);
+const actions = {
+  view: { label: '查看', icon: 'visibility', color: 'info' },
+  edit: { label: '编辑', icon: 'edit', color: 'primary' },
+  delete: { label: '删除', icon: 'delete', color: 'error' },
+} as const;
+
+const action = computed(() => actions[props.type]);
 </script>
 
 <template>
-  <v-tooltip location="top" :text>
-    <template v-slot:activator="{ props }">
+  <v-tooltip :text="action.label" location="top">
+    <template #activator="{ props: activatorProps }">
       <v-icon-btn
-        :icon
-        :icon-color="color"
+        v-bind="activatorProps"
+        :icon="action.icon"
+        :icon-color="action.color"
+        :aria-label="action.label"
+        :disabled="disabled"
+        size="small"
         variant="text"
-        v-bind="props"
         @click="emit('click')"
       />
     </template>

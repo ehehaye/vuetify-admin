@@ -1,25 +1,31 @@
+import type { RouteRecordRaw } from 'vue-router';
 import { lazyImport } from '@/router/helper';
 
-export const LOGIN_ROUTE = {
-  name: '登录',
+export const DEFAULT_ROUTE_PATH = '/home';
+
+export const LOGIN_ROUTE: RouteRecordRaw = {
+  name: 'login',
   path: '/login',
-  component: lazyImport('login/index'),
+  component: lazyImport('login/index', '/login'),
+  meta: { title: '登录' },
 };
 
-export const NOT_FOUND_ROUTE = {
-  name: '404',
+export const HOME_ROUTE: RouteRecordRaw = {
+  name: DEFAULT_ROUTE_PATH,
+  path: DEFAULT_ROUTE_PATH,
+  component: lazyImport('home/index', DEFAULT_ROUTE_PATH),
+  meta: { title: '首页', icon: 'home', keepAlive: true },
+};
+
+export const NOT_FOUND_ROUTE: RouteRecordRaw = {
+  name: 'not-found',
   path: '/exception/404',
-  component: lazyImport('exception/index'),
+  component: lazyImport('exception/index', '/exception/404'),
+  meta: { title: '页面不存在', hidden: true },
 };
 
-export const FALLBACK_ROUTE = {
+export const FALLBACK_ROUTE: RouteRecordRaw = {
   name: 'fallback',
   path: '/:pathMatch(.*)*',
-  redirect: () => NOT_FOUND_ROUTE.path,
-};
-
-export const DEFAULT_ROUTE = {
-  name: '首页',
-  path: '/home',
-  component: lazyImport('home/index'),
+  redirect: '/exception/404',
 };

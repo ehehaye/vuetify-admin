@@ -1,30 +1,45 @@
 import router from './index';
 import { NProgress } from '@/components/NProgress';
 import { getAccountStore } from '@/store/modules/account';
-import { LOGIN_ROUTE } from '@/config/routes';
-import { setDocumentTitle } from '@rthx/utils';
+import {
+  DEFAULT_ROUTE_PATH,
+  LOGIN_ROUTE,
+  NOT_FOUND_ROUTE,
+} from '@/config/routes';
+import { hasPermissions } from '@/composables/auth';
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to) => {
   NProgress.start();
 
   const accountStore = getAccountStore();
-  const isToLogin = to.name === LOGIN_ROUTE.name;
+  const isLoginRoute = to.name === LOGIN_ROUTE.name;
 
   if (!accountStore.loggedIn) {
-    if (isToLogin) return next();
-    return next(LOGIN_ROUTE.path);
+    if (isLoginRoute) return;
+
+    return {
+      path: LOGIN_ROUTE.path,
+      query: { redirect: to.fullPath },
+      replace: true,
+    };
   }
 
-  if (isToLogin) return next('/');
+  if (isLoginRoute) {
+    return { path: DEFAULT_ROUTE_PATH, replace: true };
+  }
 
-  return next();
+  if (to.meta.permission && !hasPermissions(to.meta.permission)) {
+    return { path: NOT_FOUND_ROUTE.path, replace: true };
+  }
 });
 
 router.afterEach((to) => {
-  let title = import.meta.env.VITE_APP_TITLE;
-  if (typeof to.name === 'string' && to.name) {
-    title += ` - ${to.name}`;
-  }
-  setDocumentTitle(title);
+  const appTitle = import.meta.env.VITE_APP_TITLE;
+  const pageTitle = to.meta.title;
+  document.title = pageTitle ? `${pageTitle} - ${appTitle}` : appTitle;
+  NProgress.done();
+});
+
+router.onError(() => {
   NProgress.done();
 });

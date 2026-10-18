@@ -1,6 +1,6 @@
 {
   "username": "guest",
-  "token": "ac21ebab-bddc-41a3-bef5-4ecf3325c888",
+  "token": "bd32fcac-ceed-52b4-caf6-5dfa4436d999",
   "roles": [],
   "permissions": [],
   "menus": [
@@ -9,7 +9,8 @@
       "path": "/home",
       "component": "home/index",
       "meta": {
-        "icon": "home"
+        "icon": "home",
+        "keepAlive": true
       }
     },
     {
@@ -18,25 +19,33 @@
       "meta": {
         "icon": "apps"
       },
-      "component": "",
       "children": [
         {
           "name": "项目列表",
           "path": "/project/list",
           "component": "project/index",
           "meta": {
-            "isKeepAlive": true
+            "keepAlive": true
           }
         }
       ]
     },
     {
-      "name": "404",
-      "path": "/exception/404",
-      "component": "exception/index",
+      "name": "异常页面",
+      "path": "/exception",
       "meta": {
-        "icon": "priority_high"
-      }
+        "icon": "report_problem"
+      },
+      "children": [
+        {
+          "name": "404 页面",
+          "path": "/exception/404",
+          "component": "exception/index",
+          "meta": {
+            "icon": "error_outline"
+          }
+        }
+      ]
     }
   ]
 }

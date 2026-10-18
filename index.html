@@ -1,149 +1,99 @@
 <!DOCTYPE html>
-<html lang="zh-cn">
+<html lang="zh-CN">
 
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta name="description" content="基于 Vuetify 4 的后台管理系统模板">
   <title>%VITE_APP_TITLE%</title>
   <link rel="icon" href="/logo.svg">
-  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
   <link rel="stylesheet" href="%VITE_MD_ICON_HREF%">
+  <script>
+    // 在首屏渲染前同步主题，避免亮色/暗色闪烁
+    (function () {
+      try {
+        var mode = localStorage.getItem('theme-mode');
+        if (!mode) {
+          var legacyDark = localStorage.getItem('dark');
+          mode = legacyDark === 'true' ? 'dark' : legacyDark === 'false' ? 'light' : 'system';
+        }
+        var dark = mode === 'dark' ||
+          (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        var palette = {
+          indigo: '#3F51B5',
+          blue: '#2196F3',
+          teal: '#009688',
+          cyan: '#00BCD4',
+          pink: '#E91E63',
+          red: '#F44336'
+        };
+        var color = localStorage.getItem('theme-color') || localStorage.getItem('color') || 'indigo';
+        var root = document.documentElement;
+        root.style.setProperty('--boot-bg', dark ? '#0C1116' : '#F5F7FA');
+        root.style.setProperty('--boot-surface', dark ? '#151C23' : '#FFFFFF');
+        root.style.setProperty('--boot-primary', palette[color] || palette.indigo);
+        root.style.setProperty('--boot-text', dark ? '#B4C1CE' : '#44515E');
+      } catch (error) {
+        /* localStorage 不可用时使用默认亮色 */
+      }
+    })();
+  </script>
+  <style>
+    #app_spinner_wrapper {
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+      justify-content: center;
+      background: var(--boot-bg, #F5F7FA);
+      color: var(--boot-text, #44515E);
+      font-family: 'Roboto', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+    }
+
+    #app_spinner {
+      animation: boot-rotate 1.1s linear infinite;
+    }
+
+    #app_spinner circle {
+      fill: none;
+      stroke: var(--boot-primary, #3F51B5);
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-dasharray: 120 200;
+    }
+
+    .boot-title {
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+    }
+
+    .boot-text {
+      font-size: 12px;
+      opacity: 0.7;
+    }
+
+    @keyframes boot-rotate {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
 </head>
 
 <body>
   <div id="app"></div>
-  <div id="app_spinner_wrapper">
-    <style>
-      #app_spinner_wrapper{
-        position: fixed;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        z-index: 1;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: var(--bg-color);
-      }
-  
-      #app_spinner {
-        animation: rotator 1.4s linear infinite;
-      }
-  
-      @keyframes rotator {
-        0% {
-          transform: rotate(0deg);
-        }
-  
-        100% {
-          transform: rotate(270deg);
-        }
-      }
-  
-      @keyframes rotator {
-        0% {
-          transform: rotate(0deg);
-        }
-  
-        100% {
-          transform: rotate(270deg);
-        }
-      }
-  
-      #app_spinner-path {
-        animation: dash 1.4s ease-in-out infinite, colors 5.6s ease-in-out infinite;
-        stroke-dasharray: 187;
-        stroke-dashoffset: 0;
-        transform-origin: center;
-      }
-  
-      @keyframes colors {
-        0% {
-          stroke: #4285f4;
-        }
-  
-        25% {
-          stroke: #de3e35;
-        }
-  
-        50% {
-          stroke: #f7c223;
-        }
-  
-        75% {
-          stroke: #1b9a59;
-        }
-  
-        100% {
-          stroke: #4285f4;
-        }
-      }
-  
-      @keyframes colors {
-        0% {
-          stroke: #4285f4;
-        }
-  
-        25% {
-          stroke: #de3e35;
-        }
-  
-        50% {
-          stroke: #f7c223;
-        }
-  
-        75% {
-          stroke: #1b9a59;
-        }
-  
-        100% {
-          stroke: #4285f4;
-        }
-      }
-  
-      @keyframes dash {
-        0% {
-          stroke-dashoffset: 187;
-        }
-  
-        50% {
-          stroke-dashoffset: 46.75;
-          transform: rotate(135deg);
-          transform: rotate(135deg);
-        }
-  
-        100% {
-          stroke-dashoffset: 187;
-          transform: rotate(450deg);
-        }
-      }
-  
-      @keyframes dash {
-        0% {
-          stroke-dashoffset: 187;
-        }
-  
-        50% {
-          stroke-dashoffset: 46.75;
-          transform: rotate(135deg);
-        }
-  
-        100% {
-          stroke-dashoffset: 187;
-          transform: rotate(450deg);
-        }
-      }
-    </style>
-    <script>
-      const el = document.getElementById('app_spinner_wrapper')
-      const dark = localStorage.getItem('dark') === 'true'
-      el.style.setProperty('--bg-color', dark ? 'rgba(0, 0, 0, 0.7)' : 'rgba(255, 255, 255, 0.7)')
-    </script>
-    <svg id="app_spinner" width="65px" height="65px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
-      <circle id="app_spinner-path" fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33" r="30" />
+  <div id="app_spinner_wrapper" role="status" aria-label="页面加载中">
+    <svg id="app_spinner" width="56" height="56" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="32" cy="32" r="28" />
     </svg>
+    <div class="boot-title">%VITE_APP_TITLE%</div>
+    <div class="boot-text">正在加载…</div>
   </div>
   <script type="module" src="/src/main.ts"></script>
 </body>

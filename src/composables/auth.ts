@@ -5,16 +5,14 @@ export const usePermissions = () => {
   return { permissions };
 };
 
-export const hasPermissions = (permission: string | string[]) => {
+export const hasPermissions = (required?: string | string[]) => {
+  if (!required) return true;
+
+  const requiredList = Array.isArray(required) ? required : [required];
+  if (!requiredList.length) return true;
+
   const { permissions } = usePermissions();
-
-  if (!permission.length) return true;
-
-  if (!permissions.value.length) return false;
-
-  if (Array.isArray(permission)) {
-    return permission.every((p) => permissions.value.includes(p));
-  } else {
-    return permissions.value.includes(permission);
-  }
+  return requiredList.every((permission) =>
+    permissions.value.includes(permission),
+  );
 };

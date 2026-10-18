@@ -1,23 +1,31 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Fn<T> = (...args: any[]) => Promise<T>;
 
-export const usePromiseFn = <T = any>(fn: Fn<T>, defaultResult?: T) => {
-  // https://github.com/vuejs/core/issues/2136
-  const result = ref(defaultResult) as Ref<T>;
-  const loading = ref<boolean>(false);
+/**
+ * 异步请求状态封装。
+ * 与旧实现不同，失败时会重新抛出错误，调用方可据此展示局部错误态或中断后续流程。
+ */
+export const usePromiseFn = <T>(fn: Fn<T>, defaultResult?: T) => {
+  const result = ref(defaultResult) as Ref<T | undefined>;
+  const loading = ref(false);
   const error = ref<Error | null>(null);
 
   const exec: Fn<T> = async (...args) => {
     loading.value = true;
+    error.value = null;
+
     try {
-      result.value = await fn(...args);
-      error.value = null;
-    } catch (e) {
-      error.value = e;
+      const value = await fn(...args);
+      result.value = value;
+      return value;
+    } catch (cause) {
+      const normalized =
+        cause instanceof Error ? cause : new Error(String(cause));
+      error.value = normalized;
+      throw normalized;
     } finally {
       loading.value = false;
     }
-    return result.value;
   };
 
   return { loading, error, result, exec };

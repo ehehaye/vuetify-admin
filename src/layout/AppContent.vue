@@ -2,36 +2,50 @@
 import { useSettingStore } from '@/store/modules/settings';
 import { useKeepAliveInclude } from '@/composables/layout';
 
-defineOptions({
-  name: 'AppContent',
-});
-
-const { tagsView } = storeToRefs(useSettingStore());
 const route = useRoute();
+const { tagsView, headerHeight } = storeToRefs(useSettingStore());
 const include = useKeepAliveInclude();
 </script>
 
 <template>
-  <v-main class="tw:h-full">
+  <v-main class="app-main">
     <div
-      class="tw:h-full tw:flex tw:flex-col tw:items-center tw:justify-center"
+      class="app-viewport"
+      :style="{ height: `calc(100dvh - ${headerHeight}px)` }"
     >
-      <v-expand-transition>
-        <TagsView v-if="tagsView" />
-      </v-expand-transition>
-      <div class="tw:w-full tw:h-full tw:grow tw:relative">
-        <v-container class="tw:absolute tw:inset-0 tw:py-1 tw:px-1" fluid>
-          <div class="tw:w-full tw:h-full tw:overflow-hidden">
-            <router-view v-slot="{ Component }">
-              <v-slide-x-transition mode="out-in">
-                <keep-alive :include="tagsView ? include : []">
-                  <component :is="Component" :key="route.path" />
-                </keep-alive>
-              </v-slide-x-transition>
-            </router-view>
-          </div>
-        </v-container>
+      <div class="tw:min-h-0 tw:flex-1 tw:overflow-hidden px-4 tw:pt-4 tw:pb-4">
+        <router-view v-slot="{ Component }">
+          <transition name="page" mode="out-in">
+            <keep-alive :include="tagsView ? include : []">
+              <component :is="Component" :key="route.path" />
+            </keep-alive>
+          </transition>
+        </router-view>
       </div>
     </div>
   </v-main>
 </template>
+
+<style scoped>
+.app-viewport {
+  display: flex;
+  flex-direction: column;
+}
+
+.page-enter-active,
+.page-leave-active {
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
+}
+
+.page-enter-from {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+.page-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+</style>

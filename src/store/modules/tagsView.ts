@@ -1,106 +1,106 @@
 import { useSessionStorage } from '@vueuse/core';
-import { DEFAULT_ROUTE } from '@/config/routes';
-import store from '@/store';
-import { WatchStopHandle } from 'vue';
+import type { RouteLocationNormalizedLoaded } from 'vue-router';
+import { DEFAULT_ROUTE_PATH } from '@/config/routes';
+
+export interface TabItem {
+  path: string;
+  fullPath: string;
+  title: string;
+  keepAlive: boolean;
+  closable: boolean;
+}
+
+const HOME_TAB: TabItem = {
+  path: DEFAULT_ROUTE_PATH,
+  fullPath: DEFAULT_ROUTE_PATH,
+  title: '首页',
+  keepAlive: true,
+  closable: false,
+};
+
+const toTab = (route: RouteLocationNormalizedLoaded): TabItem => ({
+  path: route.path,
+  fullPath: route.fullPath,
+  title: route.meta.title ?? String(route.name ?? route.path),
+  keepAlive: route.meta.keepAlive ?? false,
+  closable: route.path !== DEFAULT_ROUTE_PATH,
+});
 
 export const useTagsViewStore = defineStore('tagsView', () => {
-  const router = useRouter();
-  const route = useRoute();
+  const views = useSessionStorage<TabItem[]>('tags-view-tabs', []);
 
-  const views = useSessionStorage('views', []);
-
-  const activeIndex = computed(() =>
-    views.value.findIndex((v) => v.path === route.path),
-  );
-
-  function setViews(value = []) {
-    views.value = value;
-  }
-
-  function close(index: number) {
-    if (
-      views.value[index].path === DEFAULT_ROUTE.path &&
-      views.value.length <= 1
-    ) {
-      return;
-    }
-    if (index === activeIndex.value) {
-      let to;
-      if (index <= views.value.length - 2) {
-        to = views.value[index + 1];
-      } else if (index >= 1) {
-        to = views.value[index - 1];
-      } else {
-        to = { ...DEFAULT_ROUTE };
-      }
-      router.push(to);
-    }
-    views.value.splice(index, 1);
-  }
-
-  function closeRight(index: number) {
-    if (index < activeIndex.value) {
-      router.push(views.value[index]);
-    }
-    views.value = views.value.slice(0, index + 1);
-  }
-
-  function closeLeft(index: number) {
-    if (index > activeIndex.value) {
-      router.push(views.value[index]);
-    }
-    views.value = views.value.slice(index);
-  }
-
-  function closeOthers(index: number) {
-    const view = views.value[index];
-    router.push(view);
-    views.value = [view];
-  }
-
-  function switchTo({ ...to }) {
-    const index = views.value.findIndex((r) => r.path === to.path);
-    const originalView = views.value[index];
+  function sync(route: RouteLocationNormalizedLoaded) {
+    const tab = toTab(route);
+    const index = views.value.findIndex((view) => view.path === tab.path);
 
     if (index === -1) {
-      views.value.push(to);
+      views.value.push(tab);
     } else {
-      Object.assign(views.value[index], to);
+      views.value[index] = tab;
     }
 
-    if (originalView) {
-      // TODO
+    if (!views.value.some((view) => view.path === DEFAULT_ROUTE_PATH)) {
+      views.value.unshift({ ...HOME_TAB });
     }
   }
 
-  let unWatch: WatchStopHandle;
-
-  function useActivate() {
-    unWatch = watch(() => route, switchTo, {
-      immediate: true,
-      deep: true,
-    });
+  function remove(path: string) {
+    views.value = views.value.filter((view) => view.path !== path);
   }
 
-  function useDeactivated() {
-    unWatch?.();
-    unWatch = null;
-    setViews([]);
+  function close(index: number, currentPath: string): TabItem | undefined {
+    const tab = views.value[index];
+    if (!tab?.closable) return undefined;
+
+    views.value.splice(index, 1);
+
+    if (tab.path !== currentPath) return undefined;
+    return views.value[index] ?? views.value[index - 1] ?? HOME_TAB;
+  }
+
+  function closeLeft(index: number, currentPath: string) {
+    const target = views.value[index];
+    if (!target) return undefined;
+
+    views.value = views.value.filter(
+      (tab, tabIndex) => tabIndex >= index || !tab.closable,
+    );
+    return currentPath === target.path ? undefined : target;
+  }
+
+  function closeRight(index: number, currentPath: string) {
+    const target = views.value[index];
+    if (!target) return undefined;
+
+    views.value = views.value.filter(
+      (tab, tabIndex) => tabIndex <= index || !tab.closable,
+    );
+    return currentPath === target.path ? undefined : target;
+  }
+
+  function closeOthers(index: number, currentPath: string) {
+    const target = views.value[index];
+    if (!target) return undefined;
+
+    views.value = views.value.filter(
+      (tab, tabIndex) => tabIndex === index || !tab.closable,
+    );
+    return currentPath === target.path ? undefined : target;
+  }
+
+  function clear() {
+    views.value = [];
   }
 
   return {
     views,
-    setViews,
+    sync,
+    remove,
     close,
     closeLeft,
     closeRight,
     closeOthers,
-    useActivate,
-    useDeactivated,
-    $reset: useDeactivated,
+    clear,
+    $reset: clear,
   };
 });
-
-export function getTagsViewStore() {
-  return useTagsViewStore(store);
-}
