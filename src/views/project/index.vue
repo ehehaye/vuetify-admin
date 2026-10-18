@@ -54,7 +54,7 @@ const headers: DataTableHeader<ProjectInfo>[] = [
     title: '项目类型',
     key: 'type',
     align: 'start',
-    width: 110,
+    width: 130,
   },
   {
     title: '独享房间',
