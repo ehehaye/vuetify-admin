@@ -1,4 +1,15 @@
-.custom-nprogress {
-  background: rgb(var(--v-theme-primary)) !important;
-  color: rgb(var(--v-theme-on-primary)) !important;
+#nprogress .custom-nprogress {
+  background: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-on-primary));
+}
+
+#nprogress .peg {
+  box-shadow:
+    0 0 10px rgb(var(--v-theme-primary)),
+    0 0 5px rgb(var(--v-theme-primary));
+}
+
+#nprogress .spinner-icon {
+  border-top-color: rgb(var(--v-theme-primary));
+  border-left-color: rgb(var(--v-theme-primary));
 }

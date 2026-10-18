@@ -1,80 +1,112 @@
 <script setup lang="ts">
-import { useDisplay } from 'vuetify';
 import { useAccountStore } from '@/store/modules/account';
 import { useSettingStore } from '@/store/modules/settings';
+import { useTagsViewStore } from '@/store/modules/tagsView';
 
-defineOptions({
-  name: 'AppHeader',
-});
+const route = useRoute();
+const router = useRouter();
+const accountStore = useAccountStore();
+const settingStore = useSettingStore();
+const tagsStore = useTagsViewStore();
 
-const { lgAndUp } = useDisplay();
+const { username } = storeToRefs(accountStore);
+const { isDark, headerHeight, permanent, tagsView } = storeToRefs(settingStore);
 
-const { logout } = useAccountStore();
-const { username } = storeToRefs(useAccountStore());
-
-const { toggleNavigation, toggleSetting } = useSettingStore();
-const { permanentNavigation, headerHeight } = storeToRefs(useSettingStore());
-
-const title = import.meta.env.VITE_APP_TITLE;
+const appTitle = import.meta.env.VITE_APP_TITLE;
 const repo = import.meta.env.VITE_GITHUB_REPO;
+
+const title = computed(() => route.meta.title ?? appTitle);
+const initial = computed(() =>
+  (username.value || '?').slice(0, 1).toUpperCase(),
+);
+
+async function logout() {
+  tagsStore.clear();
+  accountStore.logout();
+  await router.replace('/login');
+}
 </script>
 
 <template>
-  <v-app-bar
-    :clipped-left="permanentNavigation || lgAndUp"
-    app
-    class="pr-4"
-    color="primary darken-2"
-    dark
-    flat
-    :height="headerHeight"
-  >
+  <v-app-bar class="app-header" :height="headerHeight" color="surface" flat>
     <template #prepend>
-      <v-expand-x-transition>
-        <v-app-bar-nav-icon
-          v-show="!permanentNavigation"
-          @click.stop="toggleNavigation"
-        />
-      </v-expand-x-transition>
+      <v-app-bar-nav-icon
+        v-if="!permanent"
+        aria-label="打开导航菜单"
+        @click="settingStore.toggleNavigation()"
+      />
     </template>
 
-    <template #default>
-      <v-app-bar-title>
-        {{ title }}
-      </v-app-bar-title>
-      <v-spacer />
-    </template>
+    <TagsView v-if="tagsView" />
+
+    <v-app-bar-title v-else class="tw:font-medium">
+      {{ title }}
+    </v-app-bar-title>
 
     <template #append>
-      <v-btn class="text-none" dark variant="text" @click="logout">
-        {{ username }}
-        <v-tooltip activator="parent" location="bottom"> 注销 </v-tooltip>
-      </v-btn>
+      <v-icon-btn
+        :icon="isDark ? 'light_mode' : 'dark_mode'"
+        :aria-label="isDark ? '切换到浅色模式' : '切换到深色模式'"
+        class="d-none d-sm-flex"
+        @click="settingStore.toggleDark()"
+      />
 
-      <v-btn icon color="white" @click="toggleSetting">
-        <v-icon size="20"> settings </v-icon>
-        <v-tooltip activator="parent" location="bottom"> 个性化设置 </v-tooltip>
-      </v-btn>
+      <v-icon-btn
+        tag="a"
+        :href="repo"
+        target="_blank"
+        rel="noopener noreferrer"
+        icon="code"
+        aria-label="GitHub 仓库"
+        class="d-none d-sm-flex"
+      />
 
-      <v-btn icon color="white" :href="repo" target="_blank">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          class="feather feather-github"
-        >
-          <path
-            d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"
+      <v-icon-btn
+        icon="settings"
+        aria-label="个性化设置"
+        class="d-none d-sm-flex"
+        @click="settingStore.toggleSetting()"
+      />
+
+      <v-menu location="bottom end" :offset="[0, 8]">
+        <template #activator="{ props: activatorProps }">
+          <v-btn
+            v-bind="activatorProps"
+            variant="text"
+            class="tw:ml-1 tw:px-2"
+            :aria-label="`当前用户 ${username}`"
+          >
+            <v-avatar size="32" color="primary" variant="tonal" class="tw:mr-2">
+              {{ initial }}
+            </v-avatar>
+            <span class="d-none d-sm-inline text-body-2 tw:font-medium">
+              {{ username }}
+            </span>
+            <v-icon icon="expand_more" size="18" class="tw:ml-1" />
+          </v-btn>
+        </template>
+
+        <v-list min-width="200" density="compact">
+          <v-list-item
+            :prepend-icon="isDark ? 'light_mode' : 'dark_mode'"
+            :title="isDark ? '切换到浅色模式' : '切换到深色模式'"
+            @click="settingStore.toggleDark()"
           />
-        </svg>
-        <v-tooltip activator="parent" location="bottom"> Github </v-tooltip>
-      </v-btn>
+          <v-list-item
+            prepend-icon="settings"
+            title="个性化设置"
+            @click="settingStore.toggleSetting()"
+          />
+          <v-divider class="tw:my-1" />
+          <v-list-item prepend-icon="logout" title="退出登录" @click="logout" />
+        </v-list>
+      </v-menu>
     </template>
   </v-app-bar>
 </template>
+
+<style scoped>
+.app-header {
+  border-bottom: 1px solid rgba(var(--v-theme-outline), 0.16);
+}
+</style>

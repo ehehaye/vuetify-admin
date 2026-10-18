@@ -1,26 +1,19 @@
-import request from '@/utils/request';
-import { ProjectInfo, ProjectTableReq, ProjectTableRes } from './types';
+import { http } from '@/utils/request';
+import type { ProjectInfo, ProjectTableReq, ProjectTableRes } from './types';
 
 export * from './types';
 
-export function addProject(data: ProjectInfo) {
-  return request.post('/project', data);
-}
+export const addProject = (data: ProjectInfo) =>
+  http.post<ProjectInfo>('/project', data);
 
-export function editProject(data: ProjectInfo) {
-  return request.put('/project', data);
-}
+export const editProject = (data: ProjectInfo) =>
+  http.put<ProjectInfo>('/project', data);
 
-export function deleteProject(id) {
-  return request.delete(`/project/${id}`);
-}
+export const deleteProject = (id: string) =>
+  http.delete<null>(`/project/${encodeURIComponent(id)}`);
 
-export function getProject(id) {
-  return request.get<never, ProjectInfo>(`/project/${id}`);
-}
+export const getProject = (id: string) =>
+  http.get<ProjectInfo>(`/project/${encodeURIComponent(id)}`);
 
-export function getProjects(params: ProjectTableReq) {
-  return request.get<ProjectTableReq, ProjectTableRes>('/projects', {
-    params,
-  });
-}
+export const getProjects = (params: ProjectTableReq) =>
+  http.get<ProjectTableRes>('/projects', { params });

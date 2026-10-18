@@ -1,150 +1,242 @@
 <script setup lang="ts">
-import ProjectSchema from './components/ProjectSchema.vue';
-import { deleteProject, getProjects } from '@/api/project';
+import type { DataTableHeader } from 'vuetify';
 import { formatDate } from '@rthx/utils';
-import toast from '@/utils/toast';
-import { useFocus } from '@vueuse/core';
+import { deleteProject, getProjects } from '@/api/project';
+import type { ProjectInfo } from '@/api/project';
+import toast from '@/components/Toast';
+import ProjectSchema from './components/ProjectSchema.vue';
 
-defineOptions({ name: 'ProjectList' });
+interface DataTableExpose {
+  reload: (resetPage?: boolean) => void;
+  refresh: (resetPage?: boolean) => void;
+}
 
-const tableRef = ref<IoGC<'DataTable'>>(null);
-const projectSchemaRef = ref<IoC<typeof ProjectSchema>>(null);
-const nameRef = ref(null);
+interface ProjectSchemaExpose {
+  open: (id?: string, mode?: 'edit' | 'view') => Promise<void>;
+}
 
-useFocus(nameRef);
+const tableRef = ref<DataTableExpose | null>(null);
+const schemaRef = ref<ProjectSchemaExpose | null>(null);
 
 const query = reactive({ name: '' });
 
-const headers = computed(() => [
+const deleteDialog = ref(false);
+const deleting = ref(false);
+const deleteTarget = ref<ProjectInfo | null>(null);
+
+const headers: DataTableHeader<ProjectInfo>[] = [
   {
     title: '项目名称',
-    align: 'center',
-    sortable: false,
     key: 'name',
-    minWidth: 180,
-    fixed: true,
-  },
-  {
-    title: '分钟',
-    align: 'center',
-    key: 'time',
-    minWidth: 90,
-  },
-  {
-    title: '项目类别',
-    align: 'center',
+    align: 'start',
     sortable: false,
-    key: 'category',
-    minWidth: 90,
+    minWidth: 180,
   },
   {
-    title: '展示价格（¥）',
-    align: 'center',
+    title: '时长',
+    key: 'time',
+    align: 'end',
+    width: 120,
+  },
+  {
+    title: '类别',
+    key: 'category',
+    align: 'start',
+    width: 110,
+  },
+  {
+    title: '展示价格',
     key: 'price',
-    minWidth: 150,
+    align: 'end',
+    width: 130,
   },
   {
     title: '项目类型',
-    align: 'center',
-    sortable: false,
     key: 'type',
-    minWidth: 90,
+    align: 'start',
+    width: 130,
   },
   {
     title: '独享房间',
-    align: 'center',
     key: 'occupy',
-    value: (item) => (item.occupy ? '是' : '否'),
-    minWidth: 120,
+    align: 'center',
+    width: 120,
   },
   {
-    title: '成本比例（%）',
-    align: 'center',
+    title: '成本比例',
     key: 'percent',
-    minWidth: 160,
+    align: 'end',
+    width: 170,
   },
   {
     title: '更新时间',
-    align: 'center',
     key: 'lastModifyTime',
-    value: (item) => formatDate(item.lastModifyTime, 'yyyy-MM-dd HH:mm:ss'),
-    minWidth: 190,
+    align: 'start',
+    minWidth: 170,
   },
   {
     title: '操作',
+    key: 'actions',
     align: 'center',
     sortable: false,
-    key: 'actions',
-    minWidth: 200,
-    fixed: true,
+    width: 150,
   },
-]);
+];
+
+function openCreate() {
+  void schemaRef.value?.open();
+}
+
+function openView(project: ProjectInfo) {
+  if (!project.id) return;
+  void schemaRef.value?.open(project.id, 'view');
+}
+
+function openEdit(project: ProjectInfo) {
+  if (!project.id) return;
+  void schemaRef.value?.open(project.id, 'edit');
+}
+
+function confirmDelete(project: ProjectInfo) {
+  deleteTarget.value = project;
+  deleteDialog.value = true;
+}
+
+async function removeProject() {
+  const id = deleteTarget.value?.id;
+  if (!id) return;
+
+  deleting.value = true;
+  try {
+    await deleteProject(id);
+    toast.success({ message: '删除项目成功' });
+    deleteDialog.value = false;
+    deleteTarget.value = null;
+    tableRef.value?.refresh(false);
+  } catch {
+    // 请求层已统一提示错误
+  } finally {
+    deleting.value = false;
+  }
+}
 </script>
 
 <template>
-  <div class="h-100 w-100 overflow-hidden">
-    <DataTable
-      ref="tableRef"
-      :headers
-      :load-data-fn="(options) => getProjects({ ...query, ...options })"
-    >
-      <template #search>
-        <v-row class="px-4">
-          <v-col class="py-0" cols="12">
-            <v-text-field
-              ref="nameRef"
-              v-model="query.name"
-              variant="underlined"
-              autofocus
-              placeholder="请输入关键字查询"
-              clearable
-            />
-          </v-col>
-        </v-row>
-      </template>
-
-      <template #actions>
-        <AuthProvider :required="['project:add']">
-          <v-btn class="mr-2" variant="tonal" @click="projectSchemaRef.open()">
-            新增项目
-          </v-btn>
-        </AuthProvider>
-      </template>
-
-      <template #item.time="{ item }">
-        <v-chip :color="item.time >= 60 ? 'primary' : 'dark'">
-          {{ item.time }}
-        </v-chip>
-      </template>
-
-      <template #item.actions="{ item }">
-        <ActionBtn type="view" @click="projectSchemaRef.open(item.id)" />
-
-        <AuthProvider :required="['project:update']">
-          <ActionBtn type="edit" @click="projectSchemaRef.open(item.id)" />
-        </AuthProvider>
-
-        <AuthProvider :required="['project:delete']">
-          <ActionBtn
-            type="delete"
-            @click="
-              async () => {
-                await deleteProject(item.id);
-                toast.success({ message: '删除项目成功' });
-                tableRef.refresh();
-              }
-            "
+  <div
+    class="tw:mx-auto tw:flex tw:h-full tw:w-full tw:max-w-[1500px] tw:flex-col"
+  >
+    <div class="tw:min-h-0 tw:flex-1">
+      <DataTable
+        ref="tableRef"
+        :headers="headers"
+        :params="query"
+        :load-data-fn="(options) => getProjects({ ...query, ...options })"
+      >
+        <template #search>
+          <v-text-field
+            v-model="query.name"
+            prepend-inner-icon="search"
+            placeholder="搜索项目名称"
+            clearable
+            hide-details
           />
-        </AuthProvider>
-      </template>
-    </DataTable>
+        </template>
 
-    <ProjectSchema
-      ref="projectSchemaRef"
-      @edit-success="tableRef.refresh()"
-      @add-success="tableRef.refresh()"
-    />
+        <template #actions>
+          <AuthProvider :required="['project:add']">
+            <v-btn color="primary" prepend-icon="add" @click="openCreate">
+              新增项目
+            </v-btn>
+          </AuthProvider>
+        </template>
+
+        <template #item.time="{ item }">
+          <v-chip
+            size="small"
+            variant="tonal"
+            :color="item.time >= 60 ? 'primary' : 'secondary'"
+          >
+            {{ item.time }} 分钟
+          </v-chip>
+        </template>
+
+        <template #item.category="{ item }">
+          <v-chip size="small" variant="tonal">
+            {{ item.category }}
+          </v-chip>
+        </template>
+
+        <template #item.price="{ item }">
+          <span class="tw:font-medium">¥{{ item.price }}</span>
+        </template>
+
+        <template #item.occupy="{ item }">
+          <v-chip
+            size="small"
+            variant="tonal"
+            :color="item.occupy ? 'success' : undefined"
+          >
+            {{ item.occupy ? '是' : '否' }}
+          </v-chip>
+        </template>
+
+        <template #item.percent="{ item }">
+          <div class="tw:flex tw:items-center tw:justify-end tw:gap-2">
+            <v-progress-linear
+              :model-value="item.percent"
+              color="primary"
+              height="6"
+              rounded
+              class="tw:w-16"
+            />
+            <span class="text-body-2">{{ item.percent }}%</span>
+          </div>
+        </template>
+
+        <template #item.lastModifyTime="{ item }">
+          <span class="text-body-2 text-medium-emphasis">
+            {{
+              item.lastModifyTime
+                ? formatDate(item.lastModifyTime, 'yyyy-MM-dd HH:mm')
+                : '—'
+            }}
+          </span>
+        </template>
+
+        <template #item.actions="{ item }">
+          <ActionBtn type="view" @click="openView(item)" />
+
+          <AuthProvider :required="['project:update']">
+            <ActionBtn type="edit" @click="openEdit(item)" />
+          </AuthProvider>
+
+          <AuthProvider :required="['project:delete']">
+            <ActionBtn type="delete" @click="confirmDelete(item)" />
+          </AuthProvider>
+        </template>
+      </DataTable>
+    </div>
+
+    <ProjectSchema ref="schemaRef" @saved="tableRef?.refresh(false)" />
+
+    <v-dialog v-model="deleteDialog" max-width="420">
+      <v-card>
+        <v-card-item>
+          <template #title>删除项目</template>
+        </v-card-item>
+
+        <v-card-text class="text-body-2">
+          确定删除「{{ deleteTarget?.name }}」吗？此操作不可撤销。
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer />
+          <v-btn variant="text" @click="deleteDialog = false">取消</v-btn>
+          <v-btn color="error" :loading="deleting" @click="removeProject">
+            删除
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
-
-<style lang="scss"></style>

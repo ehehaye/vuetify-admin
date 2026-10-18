@@ -1,62 +1,111 @@
 <script setup lang="ts">
 import { useAccountStore } from '@/store/modules/account';
 import { useSettingStore } from '@/store/modules/settings';
-import { useOpenedMenus } from '@/composables/layout';
+import { useTagsViewStore } from '@/store/modules/tagsView';
+import NavItem from './components/NavItem.vue';
 
-defineOptions({
-  name: 'AppNavigation',
-});
+const route = useRoute();
+const router = useRouter();
+const accountStore = useAccountStore();
+const settingStore = useSettingStore();
+const tagsStore = useTagsViewStore();
 
-const { menus: items } = storeToRefs(useAccountStore());
-const { permanentNavigation, navigation } = storeToRefs(useSettingStore());
-const { toggleNavigation } = useSettingStore();
-const opened = useOpenedMenus();
-const placeholderIcon = 'description';
+const { menus, username } = storeToRefs(accountStore);
+const { permanent, drawerOpen, headerHeight } = storeToRefs(settingStore);
+
+const appTitle = import.meta.env.VITE_APP_TITLE;
+const opened = ref<string[]>([]);
+
+const activeGroup = computed(
+  () =>
+    menus.value.find((menu) =>
+      menu.children?.some((child) => child.path === route.path),
+    )?.path,
+);
+
+const initial = computed(() =>
+  (username.value || '?').slice(0, 1).toUpperCase(),
+);
+
+watch(
+  () => route.path,
+  () => {
+    if (activeGroup.value && !opened.value.includes(activeGroup.value)) {
+      opened.value.push(activeGroup.value);
+    }
+    settingStore.closeNavigation();
+  },
+  { immediate: true },
+);
+
+async function logout() {
+  tagsStore.clear();
+  accountStore.logout();
+  await router.replace('/login');
+}
 </script>
 
 <template>
   <v-navigation-drawer
-    :model-value="permanentNavigation || navigation"
-    :permanent="permanentNavigation"
-    @update:model-value="toggleNavigation"
+    class="app-drawer"
+    :model-value="drawerOpen"
+    :permanent="permanent"
+    :temporary="!permanent"
+    :width="264"
+    @update:model-value="settingStore.setNavigation"
   >
-    <v-treeview
-      :activatable="false"
-      active-strategy="leaf"
-      color="primary"
-      class="pt-0"
-      :items
-      item-title="name"
-      item-props="meta"
-      item-value="path"
-      height="100%"
-      collapse-icon=""
-      expand-icon=""
-      :opened
-    >
-      <template #prepend="{ item }">
-        <v-icon>{{ item.meta.icon || placeholderIcon }}</v-icon>
-      </template>
+    <div class="tw:flex tw:h-full tw:flex-col">
+      <router-link
+        to="/home"
+        class="tw:flex tw:shrink-0 tw:items-center tw:gap-3 tw:px-4"
+        :style="{ height: `${headerHeight}px` }"
+      >
+        <img src="/logo.svg" alt="" class="tw:h-9 tw:w-9" />
+        <div class="tw:min-w-0">
+          <div class="text-subtitle-1 tw:truncate tw:font-semibold">
+            {{ appTitle }}
+          </div>
+          <div class="text-caption text-medium-emphasis">管理控制台</div>
+        </div>
+      </router-link>
 
-      <template #append="{ isActive, item }">
-        <v-icon v-if="item.children?.length">{{
-          isActive ? 'expand_less' : 'expand_more'
-        }}</v-icon>
-      </template>
+      <v-divider />
 
-      <template #item="{ props }">
-        <v-treeview-item
-          v-if="!props.isHidden"
-          :height="48"
-          :title="props.title"
-          :to="props.value"
-          :active="opened.includes(props.value)"
+      <div class="tw:min-h-0 tw:flex-1 tw:overflow-y-auto tw:px-2 tw:py-3">
+        <v-list v-model:opened="opened" nav>
+          <NavItem v-for="item in menus" :key="item.path" :item="item" />
+        </v-list>
+      </div>
+
+      <v-divider />
+
+      <div class="tw:p-3">
+        <div
+          class="tw:flex tw:items-center tw:gap-3 tw:rounded-xl tw:bg-surface-variant/50 tw:p-3"
         >
-          <template #prepend>
-            <v-icon>{{ props.icon || placeholderIcon }}</v-icon>
-          </template>
-        </v-treeview-item>
-      </template>
-    </v-treeview>
+          <v-avatar size="36" color="primary" variant="tonal">
+            {{ initial }}
+          </v-avatar>
+          <div class="tw:min-w-0 tw:flex-1">
+            <div class="text-body-2 tw:truncate tw:font-medium">
+              {{ username }}
+            </div>
+            <div class="text-caption text-medium-emphasis">已登录</div>
+          </div>
+          <v-icon-btn
+            icon="logout"
+            size="small"
+            aria-label="退出登录"
+            @click="logout"
+          />
+        </div>
+      </div>
+    </div>
   </v-navigation-drawer>
 </template>
+
+<style scoped>
+.app-drawer {
+  border-right: 1px solid rgba(var(--v-theme-outline), 0.16);
+}
+</style>

@@ -1,8 +1,6 @@
-import request from '@/utils/request';
-import { LoginRes, LoginReq } from './types';
+import { http } from '@/utils/request';
+import type { AccountInfo, LoginReq } from './types';
 
 export * from './types';
 
-export function login(data: LoginReq) {
-  return request.post<LoginReq, LoginRes>('/login', data);
-}
+export const login = (data: LoginReq) => http.post<AccountInfo>('/login', data);

@@ -1,7 +1,7 @@
 {
   "username": "admin",
   "token": "ac21ebab-bddc-41a3-bef5-4ecf3325c888",
-  "roles": [],
+  "roles": ["admin"],
   "permissions": [
     "project:add",
     "project:update",
@@ -13,13 +13,13 @@
       "path": "/home",
       "component": "home/index",
       "meta": {
-        "icon": "home"
+        "icon": "home",
+        "keepAlive": true
       }
     },
     {
       "name": "项目管理",
       "path": "/project",
-      "component": "",
       "meta": {
         "icon": "apps"
       },
@@ -27,10 +27,9 @@
         {
           "name": "项目列表",
           "path": "/project/list",
-          "type": "VIEW",
           "component": "project/index",
           "meta": {
-            "isKeepAlive": true
+            "keepAlive": true
           }
         }
       ]
@@ -41,16 +40,25 @@
       "component": "map/index",
       "meta": {
         "icon": "place",
-        "isKeepAlive": true
+        "keepAlive": true
       }
     },
     {
-      "name": "404",
-      "path": "/exception/404",
-      "component": "exception/index",
+      "name": "异常页面",
+      "path": "/exception",
       "meta": {
-        "icon": "priority_high"
-      }
+        "icon": "report_problem"
+      },
+      "children": [
+        {
+          "name": "404 页面",
+          "path": "/exception/404",
+          "component": "exception/index",
+          "meta": {
+            "icon": "error_outline"
+          }
+        }
+      ]
     }
   ]
 }

@@ -1,67 +1,109 @@
 import axios from 'axios';
-import { parse, stringify } from 'qs';
-import toast from '@/utils/toast';
+import type { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { stringify } from 'qs';
+import toast from '@/components/Toast';
 import { getAccountStore } from '@/store/modules/account';
 
-const request = axios.create({
+const instance = axios.create({
   baseURL: '/api',
+  timeout: 15000,
   responseType: 'json',
-  validateStatus: (status) => status === 200,
-  // https://github.com/axios/axios/issues/1644
+  validateStatus: (status) => status >= 200 && status < 300,
   paramsSerializer: {
-    encode: parse,
-    serialize: stringify,
+    serialize: (params) =>
+      stringify(params, { arrayFormat: 'repeat', skipNulls: true }),
   },
 });
 
-request.interceptors.request.use((config) => {
+instance.interceptors.request.use((config) => {
   const { account } = getAccountStore();
-  const { token } = account;
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+
+  if (account.token) {
+    config.headers.Authorization = `Bearer ${account.token}`;
   }
+
   return config;
 });
 
-request.interceptors.response.use(
-  (config) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, message, success } = config.data as ApiRes<any>;
-    if (!success) {
-      toast.error({ message });
-      return Promise.reject(new Error(message));
-    }
-    return data;
-  },
-  (error) => {
-    let message = '';
-    if (error.response) {
-      if (error.response.data) {
-        message = error.response.data.message;
-      } else {
-        switch (error.response.status) {
-          case 404:
-            message = '资源未找到';
-            break;
-          case 403:
-            message = '操作被禁止';
-            break;
-          case 401:
-            message = '暂无权限';
-            break;
-          case 500:
-            message = '服务器异常';
-            break;
-          default:
-            break;
-        }
+const statusMessages: Record<number, string> = {
+  400: '请求参数有误',
+  403: '操作被禁止',
+  404: '资源未找到',
+  401: '登录状态已失效，请重新登录',
+  500: '服务器异常',
+};
+
+instance.interceptors.response.use(
+  (response): AxiosResponse => {
+    const body: unknown = response.data;
+
+    if (body && typeof body === 'object' && 'success' in body) {
+      const { data, message, success } = body as ApiRes<unknown>;
+
+      if (!success) {
+        toast.error({ message: message || '请求失败' });
+        return Promise.reject(
+          new Error(message || '请求失败'),
+        ) as unknown as AxiosResponse;
       }
-    } else {
-      message = error.message === 'Network Error' ? '网络异常' : error.message;
+
+      // 运行时返回解包后的业务数据，类型由 http.* 的第二个泛型声明
+      return data as unknown as AxiosResponse;
     }
+
+    return body as unknown as AxiosResponse;
+  },
+  async (error: AxiosError<ApiRes<unknown>>) => {
+    const status = error.response?.status;
+    let message = error.response?.data?.message;
+
+    if (!message && status) {
+      message = statusMessages[status] ?? `请求失败（${status}）`;
+    }
+
+    if (!message) {
+      message =
+        error.code === 'ECONNABORTED'
+          ? '请求超时，请稍后重试'
+          : error.message === 'Network Error'
+            ? '网络异常，请检查连接'
+            : error.message;
+    }
+
+    if (status === 401) {
+      const [{ getAccountStore }, { default: router }] = await Promise.all([
+        import('@/store/modules/account'),
+        import('@/router'),
+      ]);
+      getAccountStore().logout();
+
+      if (router.currentRoute.value.path !== '/login') {
+        await router.replace({
+          path: '/login',
+          query: { redirect: router.currentRoute.value.fullPath },
+        });
+      }
+    }
+
     toast.error({ message });
-    return Promise.reject(error);
+    return Promise.reject(new Error(message));
   },
 );
 
-export default request;
+/** 响应拦截器已解包 ApiRes，因此这里的返回值直接是业务数据 */
+export const http = {
+  get<T>(url: string, config?: AxiosRequestConfig) {
+    return instance.get<unknown, T>(url, config);
+  },
+  post<T>(url: string, data?: unknown, config?: AxiosRequestConfig) {
+    return instance.post<unknown, T>(url, data, config);
+  },
+  put<T>(url: string, data?: unknown, config?: AxiosRequestConfig) {
+    return instance.put<unknown, T>(url, data, config);
+  },
+  delete<T>(url: string, config?: AxiosRequestConfig) {
+    return instance.delete<unknown, T>(url, config);
+  },
+};
+
+export default instance;

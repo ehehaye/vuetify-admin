@@ -1,0 +1,112 @@
+@layer theme, base, components, utilities, app-overrides;
+
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+
+/*
+ * 所有 Tailwind 工具类统一使用 tw: 前缀，避免与 Vuetify 的原子类冲突。
+ * 颜色令牌直接桥接 Vuetify 主题变量，因此主题切换无需额外配置。
+ */
+@theme inline prefix(tw) {
+  --font-sans: var(
+    --v-font-body,
+    'Roboto',
+    'Noto Sans SC',
+    'PingFang SC',
+    'Microsoft YaHei',
+    system-ui,
+    sans-serif
+  );
+
+  --color-primary: rgb(var(--v-theme-primary));
+  --color-on-primary: rgb(var(--v-theme-on-primary));
+  --color-primary-lighten-1: rgb(var(--v-theme-primary-lighten-1));
+  --color-primary-lighten-2: rgb(var(--v-theme-primary-lighten-2));
+  --color-primary-darken-1: rgb(var(--v-theme-primary-darken-1));
+  --color-primary-darken-2: rgb(var(--v-theme-primary-darken-2));
+  --color-primary-darken-3: rgb(var(--v-theme-primary-darken-3));
+
+  --color-secondary: rgb(var(--v-theme-secondary));
+  --color-on-secondary: rgb(var(--v-theme-on-secondary));
+  --color-secondary-lighten-1: rgb(var(--v-theme-secondary-lighten-1));
+  --color-secondary-darken-1: rgb(var(--v-theme-secondary-darken-1));
+  --color-secondary-darken-2: rgb(var(--v-theme-secondary-darken-2));
+
+  --color-surface: rgb(var(--v-theme-surface));
+  --color-surface-bright: rgb(var(--v-theme-surface-bright));
+  --color-surface-light: rgb(var(--v-theme-surface-light));
+  --color-surface-variant: rgb(var(--v-theme-surface-variant));
+  --color-on-surface: rgb(var(--v-theme-on-surface));
+  --color-on-surface-variant: rgb(var(--v-theme-on-surface-variant));
+  --color-background: rgb(var(--v-theme-background));
+  --color-on-background: rgb(var(--v-theme-on-background));
+  --color-outline: rgb(var(--v-theme-outline));
+
+  --color-error: rgb(var(--v-theme-error));
+  --color-on-error: rgb(var(--v-theme-on-error));
+  --color-info: rgb(var(--v-theme-info));
+  --color-on-info: rgb(var(--v-theme-on-info));
+  --color-success: rgb(var(--v-theme-success));
+  --color-on-success: rgb(var(--v-theme-on-success));
+  --color-warning: rgb(var(--v-theme-warning));
+  --color-on-warning: rgb(var(--v-theme-on-warning));
+
+  --breakpoint-sm: 600px;
+  --breakpoint-md: 960px;
+  --breakpoint-lg: 1280px;
+  --breakpoint-xl: 1920px;
+  --breakpoint-2xl: 2560px;
+}
+
+@layer app-overrides {
+  :root {
+    --v-font-body:
+      'Roboto', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui,
+      sans-serif;
+    --v-font-heading: var(--v-font-body);
+    color-scheme: light;
+  }
+
+  .v-theme--indigo_dark,
+  .v-theme--blue_dark,
+  .v-theme--teal_dark,
+  .v-theme--cyan_dark,
+  .v-theme--pink_dark,
+  .v-theme--red_dark {
+    color-scheme: dark;
+  }
+
+  html,
+  body,
+  #app {
+    min-height: 100%;
+  }
+
+  body {
+    background-color: rgb(var(--v-theme-background));
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* 固定表头需要不透明背景，避免滚动时内容透出 */
+  .data-table .v-table--fixed-header > .v-table__wrapper > table > thead > tr {
+    background-color: rgb(var(--v-theme-surface));
+  }
+
+  .data-table .v-table__wrapper > table > thead > tr > th {
+    color: rgb(var(--v-theme-on-surface-variant));
+    font-weight: 600;
+  }
+
+  /* 隐藏横向滚动条，保持页签栏干净 */
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}

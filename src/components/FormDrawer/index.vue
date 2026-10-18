@@ -1,108 +1,101 @@
 <script setup lang="ts">
-import { useSettingStore } from '@/store/modules/settings';
+import type { VForm } from 'vuetify/components';
 
-defineOptions({ name: 'FormDrawer' });
+interface Props {
+  modelValue: boolean;
+  title?: string;
+  subtitle?: string;
+  loading?: boolean;
+  width?: number | string;
+}
 
-const props = defineProps({
-  flat: {
-    type: Boolean,
-    default: false,
-  },
-  loading: {
-    type: Boolean,
-    default: false,
-  },
-  title: {
-    type: String,
-    default: '',
-  },
-  modelValue: {
-    type: Boolean,
-    default: false,
-  },
-  width: {
-    type: Number,
-    default: 650,
-  },
-  afterClose: {
-    type: Function,
-    default: () => {},
-  },
+const props = withDefaults(defineProps<Props>(), {
+  title: '',
+  subtitle: '',
+  loading: false,
+  width: 560,
 });
 
 const emit = defineEmits<{
+  'update:modelValue': [value: boolean];
   submit: [];
-  'update:model-value': [value: boolean];
+  closed: [];
 }>();
 
-const formRef = ref<IoGC<'VForm'>>(null);
+const formRef = ref<InstanceType<typeof VForm> | null>(null);
 
-const { headerHeight } = storeToRefs(useSettingStore());
+function close() {
+  emit('update:modelValue', false);
+}
+
+async function submit() {
+  const { valid } = (await formRef.value?.validate()) ?? { valid: false };
+  if (valid) emit('submit');
+}
 
 watch(
   () => props.modelValue,
-  (open) => {
-    if (!open) afterClose();
+  async (open) => {
+    if (open) return;
+    await nextTick();
+    formRef.value?.resetValidation();
+    emit('closed');
   },
 );
 
-const afterClose = async () => {
-  props.afterClose();
-  await nextTick();
-  formRef.value.resetValidation();
-};
-
-const submit = async () => {
-  const { valid } = await formRef.value.validate();
-  if (valid) emit('submit');
-};
+defineExpose({ submit, close });
 </script>
 
 <template>
-  <Teleport to="#v-application">
-    <v-navigation-drawer
-      class="FormWrapper"
-      :permanent="false"
-      location="right"
-      temporary
-      :order="-1"
-      :width="width"
-      :model-value="modelValue"
-      @update:model-value="emit('update:model-value', $event)"
-    >
-      <template #prepend>
-        <v-toolbar :height="headerHeight" color="primary darken-1">
-          <v-toolbar-title>
-            {{ title }}
-          </v-toolbar-title>
-        </v-toolbar>
-      </template>
+  <v-navigation-drawer
+    :model-value="modelValue"
+    :width="width"
+    location="right"
+    temporary
+    class="form-drawer"
+    @update:model-value="emit('update:modelValue', $event)"
+  >
+    <div class="tw:flex tw:h-full tw:flex-col">
+      <div
+        class="tw:flex tw:items-start tw:justify-between tw:gap-4 tw:border-b tw:border-outline/20 tw:px-6 tw:py-5"
+      >
+        <div class="tw:min-w-0">
+          <h2 class="text-h6 tw:font-semibold">{{ title }}</h2>
+          <p v-if="subtitle" class="text-body-2 text-medium-emphasis tw:mt-1">
+            {{ subtitle }}
+          </p>
+        </div>
+        <v-icon-btn
+          icon="close"
+          size="small"
+          aria-label="关闭"
+          @click="close"
+        />
+      </div>
 
       <v-form
-        class="d-flex flex-column h-100"
         ref="formRef"
+        class="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col"
         @submit.prevent="submit"
       >
-        <v-card :flat="flat" class="overflow-y-auto flex-1-0">
-          <v-card-text class="flex-grow-1">
-            <slot name="content" />
-          </v-card-text>
-        </v-card>
+        <div class="tw:min-h-0 tw:flex-1 tw:overflow-y-auto tw:px-6 tw:py-5">
+          <slot name="content" />
+        </div>
 
-        <Spin :model-value="loading" />
-        <v-divider />
-        <div class="w-100 d-flex flex-row">
-          <slot name="actions" />
+        <div
+          class="tw:flex tw:shrink-0 tw:items-center tw:gap-2 tw:border-t tw:border-outline/20 tw:px-6 tw:py-4"
+        >
+          <slot name="actions">
+            <v-spacer />
+            <v-btn variant="text" @click="close">取消</v-btn>
+            <v-btn color="primary" type="submit" :loading="loading">
+              保存
+            </v-btn>
+          </slot>
         </div>
       </v-form>
-    </v-navigation-drawer>
-  </Teleport>
-</template>
+    </div>
 
-<style lang="scss">
-.FormWrapper {
-  .v-navigation-drawer__content {
-    flex: 1;
-  }
-}
-</style>
+    <Spin :model-value="loading" />
+  </v-navigation-drawer>
+</template>

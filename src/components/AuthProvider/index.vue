@@ -1,17 +1,14 @@
 <script setup lang="ts">
-import { usePermissions, hasPermissions } from '@/composables/auth';
+import { usePermissions } from '@/composables/usePermissions';
 
-defineOptions({ name: 'AuthProvider' });
+const props = withDefaults(defineProps<{ required?: string | string[] }>(), {
+  required: '',
+});
 
-interface Props {
-  required: string | string[];
-}
-
-const props = withDefaults(defineProps<Props>(), { required: '' });
-
-const { permissions } = usePermissions();
+const { hasPermission } = usePermissions();
+const allowed = hasPermission(() => props.required);
 </script>
 
 <template>
-  <slot v-if="hasPermissions(props.required)" :permissions></slot>
+  <slot v-if="allowed" />
 </template>
