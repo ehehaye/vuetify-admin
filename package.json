@@ -4,7 +4,7 @@
   "private": true,
   "author": "hongxin.tang@hotmail.com",
   "license": "MIT",
-  "description": "基于 vuetify3 的自带诸多后台管理系统模板，内置动态路由、权限验证等功能",
+  "description": "基于 vuetify4 的自带诸多后台管理系统模板，内置动态路由、权限验证等功能",
   "keywords": [
     "vuetify",
     "material-design",
@@ -37,7 +37,7 @@
     "v-keep-scroll": "^0.0.14",
     "vue": "^3.5.13",
     "vue-router": "^5.0.2",
-    "vuetify": "3.5.9"
+    "vuetify": "^4.2.6"
   },
   "devDependencies": {
     "@eslint/compat": "^1.2.4",
@@ -62,6 +62,6 @@
     "vite": "^7.3.5",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-eslint": "^1.8.1",
-    "vite-plugin-vuetify": "^2.0.3"
+    "vite-plugin-vuetify": "^2.1.3"
   }
 }

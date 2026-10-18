@@ -2,15 +2,11 @@ import 'vuetify/styles';
 import { createVuetify } from 'vuetify';
 import { aliases, md } from 'vuetify/iconsets/md';
 import { zhHans } from 'vuetify/locale';
-import * as labs from 'vuetify/labs/components';
 import { Plugin } from 'vue';
 import theme from '@/config/theme';
 
 const plugin: Plugin = function (app) {
   const vuetify = createVuetify({
-    components: {
-      ...labs,
-    },
     icons: {
       defaultSet: 'md',
       aliases,
@@ -23,7 +19,18 @@ const plugin: Plugin = function (app) {
       fallback: 'zhHans',
       messages: { zhHans },
     },
-    theme,
+    theme: {
+      defaultTheme: 'indigo_light',
+      ...theme,
+    },
+    display: {
+      thresholds: {
+        md: 960,
+        lg: 1280,
+        xl: 1920,
+        xxl: 2560,
+      },
+    },
   });
 
   app.use(vuetify);

@@ -13,11 +13,11 @@ export const useSettingStore = defineStore('setting', () => {
   const setting = useLocalStorage('setting', false);
   const tagsView = useLocalStorage('tagsView', true);
 
-  const { name } = useTheme().global;
+  const theme = useTheme();
   const tn = computed<ThemeName>(
     () => `${color.value}${dark.value ? '_dark' : '_light'}`,
   );
-  watch(tn, () => (name.value = tn.value), { immediate: true });
+  watch(tn, (name) => theme.change(name), { immediate: true });
 
   function setColor(c: Color) {
     color.value = c;

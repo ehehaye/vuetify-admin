@@ -61,9 +61,12 @@ export default defineConfig(({ mode }) => {
         'v-keep-scroll',
         'nprogress',
         '@rthx/vue3-amap',
+        'vuetify/components/VOverlay',
+        'vuetify/components/VDialog',
+        'vuetify/components/VMenu',
+        'vuetify/components/VSelect',
+        'vuetify/components/VTooltip',
       ],
-      // https://stackoverflow.com/questions/75469067/vite-cypress-how-to-prevent-reloading-due-to-optimized-dependencies-causin
-      exclude: ['vuetify'],
       entries: ['./src/**/*.vue'],
     },
     resolve: {

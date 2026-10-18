@@ -46,7 +46,7 @@ const repo = import.meta.env.VITE_GITHUB_REPO;
     </template>
 
     <template #append>
-      <v-btn class="text-none" dark variant="text" @click="logout">
+      <v-btn dark variant="text" @click="logout">
         {{ username }}
         <v-tooltip activator="parent" location="bottom"> 注销 </v-tooltip>
       </v-btn>

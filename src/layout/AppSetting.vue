@@ -93,7 +93,7 @@ const settingStore = useSettingStore();
 <style lang="scss">
 .app-setting {
   &__trigger-btn {
-    top: 50% !important;
+    top: 50%;
   }
 
   &__label {
