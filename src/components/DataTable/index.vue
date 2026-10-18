@@ -136,7 +136,9 @@ defineExpose({ reload, refresh });
       class="tw:min-h-0 tw:flex-1 tw:overflow-hidden tw:rounded-xl tw:border tw:border-outline/20"
     >
       <v-data-table-server
-        v-model:options="options"
+        v-model:page="options.page"
+        v-model:items-per-page="options.itemsPerPage"
+        v-model:sort-by="options.sortBy"
         class="tw:h-full"
         :headers="headers"
         :items="items"
