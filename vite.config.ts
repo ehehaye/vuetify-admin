@@ -50,6 +50,7 @@ export default defineConfig(({ mode }) => {
       entries: ['./src/**/*.{vue,ts}'],
     },
     resolve: {
+      mainFields: ['module', 'browser', 'jsnext:main', 'jsnext'],
       extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue'],
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
@@ -63,18 +64,17 @@ export default defineConfig(({ mode }) => {
       },
     },
     build: {
-      rollupOptions: {
+      rolldownOptions: {
         output: {
-          manualChunks(id) {
-            if (id.includes('node_modules/vuetify/')) return 'vuetify';
-            if (
-              id.includes('node_modules/vue/') ||
-              id.includes('node_modules/vue-router/') ||
-              id.includes('node_modules/pinia/')
-            ) {
-              return 'vue';
-            }
-            if (id.includes('node_modules/axios/')) return 'axios';
+          codeSplitting: {
+            groups: [
+              { name: 'vuetify', test: /node_modules[\\/]vuetify[\\/]/ },
+              {
+                name: 'vue',
+                test: /node_modules[\\/](vue|vue-router|pinia)[\\/]/,
+              },
+              { name: 'axios', test: /node_modules[\\/]axios[\\/]/ },
+            ],
           },
         },
       },

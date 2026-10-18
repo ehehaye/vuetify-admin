@@ -5,7 +5,7 @@
 ## Project
 
 - 入口：`index.html` → `src/main.ts`（`createApp` → `plugins` → 按需加载 `./mock` → Tailwind CSS）。
-- 包管理器 **pnpm**（`pnpm-lock.yaml`），Node `>=20.19.0`，`"type": "module"`。
+- 包管理器 **pnpm**（`pnpm-lock.yaml`），Node `>=22.13.0`，`"type": "module"`。
 - 别名 `@` → `src`（见 `vite.config.ts` 与 `tsconfig.json`）。
 - 环境变量在 `.env*` 中，只用 `VITE_*`：`VITE_APP_TITLE`、`VITE_ROUTER_HISTORY`、`VITE_MD_ICON_HREF`、`VITE_USE_MOCK`、`VITE_AMAP_JS_KEY`、`VITE_GITHUB_REPO`。类型声明见 `src/env.d.ts`。
 - 字体：`@fontsource/roboto`（仅 latin 子集），中文回退到系统中文字体。
