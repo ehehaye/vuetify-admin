@@ -1,0 +1,27 @@
+/* Roboto latin 子集：现代浏览器均支持 woff2，不再输出 woff 回退 */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url('@fontsource/roboto/files/roboto-latin-400-normal.woff2')
+    format('woff2');
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url('@fontsource/roboto/files/roboto-latin-500-normal.woff2')
+    format('woff2');
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 700;
+  src: url('@fontsource/roboto/files/roboto-latin-700-normal.woff2')
+    format('woff2');
+}

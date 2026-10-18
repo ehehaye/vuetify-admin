@@ -77,6 +77,6 @@ src/
 
 ## Mock
 
-开发环境默认启用本地 Mock（`.env.development` 中 `VITE_USE_MOCK=true`），生产构建默认关闭。若需在生产预览 Mock，可在构建时设置 `VITE_USE_MOCK=true`。
+开发环境默认启用本地 Mock（`.env.development` 中 `VITE_USE_MOCK=true`）。演示站点的生产构建同样启用了 Mock（`.env.production`），接入真实接口时将其改为 `false` 即可。
 
 Mock 数据在内存中修改，刷新页面后恢复为初始值。

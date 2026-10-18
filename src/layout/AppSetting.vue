@@ -36,10 +36,12 @@ function handleDrawer(value: boolean) {
 </script>
 
 <template>
+  <!-- order 小于导航抽屉（全局默认 -1），否则临时遮罩会排在常驻导航下方 -->
   <v-navigation-drawer
     :model-value="store.setting"
     location="right"
     temporary
+    :order="-2"
     :width="360"
     @update:model-value="handleDrawer"
   >
@@ -103,9 +105,9 @@ function handleDrawer(value: boolean) {
               >
                 <v-icon
                   v-if="store.color === item.value"
+                  class="color-swatch__check"
                   icon="check"
                   size="16"
-                  color="white"
                 />
               </span>
               <span class="text-body-2">{{ item.label }}</span>
@@ -174,5 +176,9 @@ function handleDrawer(value: boolean) {
   height: 26px;
   place-items: center;
   border-radius: 50%;
+}
+
+.color-swatch__check {
+  color: #fff;
 }
 </style>

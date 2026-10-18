@@ -19,7 +19,10 @@ export default defineConfig(({ mode }) => {
         dts: './types/auto-imports.d.ts',
       }),
       vue(),
-      vuetify({ autoImport: { labs: true } }),
+      vuetify({
+        autoImport: { labs: true },
+        styles: { configFile: 'src/plugins/vuetify/settings.scss' },
+      }),
       tailwindcss(),
       Components({
         globs: ['src/components/**/index.vue'],
@@ -48,6 +51,9 @@ export default defineConfig(({ mode }) => {
     ],
     optimizeDeps: {
       entries: ['./src/**/*.{vue,ts}'],
+      // vite-plugin-vuetify 注入的是 `vuetify/components/XXX` 深层导入，
+      // 依赖扫描器看不到这些注入代码，首次访问新页面时会触发重新预构建并报 504。
+      include: ['vuetify/components/*', 'vuetify/directives'],
     },
     resolve: {
       mainFields: ['module', 'browser', 'jsnext:main', 'jsnext'],
@@ -68,7 +74,6 @@ export default defineConfig(({ mode }) => {
         output: {
           codeSplitting: {
             groups: [
-              { name: 'vuetify', test: /node_modules[\\/]vuetify[\\/]/ },
               {
                 name: 'vue',
                 test: /node_modules[\\/](vue|vue-router|pinia)[\\/]/,

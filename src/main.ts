@@ -1,8 +1,6 @@
 // 必须先于 Tailwind 导入，确保 Vuetify 的 CSS layer 顺序稳定
 import installPlugins from './plugins';
-import '@fontsource/roboto/latin-400.css';
-import '@fontsource/roboto/latin-500.css';
-import '@fontsource/roboto/latin-700.css';
+import './assets/styles/fonts.css';
 import './assets/styles/tailwind.css';
 import App from './App.vue';
 import router from './router';

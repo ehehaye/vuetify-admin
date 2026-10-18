@@ -1,0 +1,4 @@
+// 仅保留主题色工具类，去掉 Vuetify 内置的 Material 调色板（项目未使用）
+@use 'vuetify/settings' with (
+  $color-pack: false
+);

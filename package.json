@@ -35,7 +35,6 @@
     "material-design-icons-iconfont": "^6.7.0",
     "nprogress": "^0.2.0",
     "pinia": "^4.1.0",
-    "qs": "^6.16.1",
     "vue": "^3.5.44",
     "vue-router": "^5.4.0",
     "vuetify": "^4.2.6"

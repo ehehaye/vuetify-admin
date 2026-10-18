@@ -1,8 +1,39 @@
 import axios from 'axios';
 import type { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { stringify } from 'qs';
 import toast from '@/components/Toast';
 import { getAccountStore } from '@/store/modules/account';
+
+// 与原先 qs 的 arrayFormat: 'repeat', skipNulls: true 行为保持一致
+function serializeQuery(params: Record<string, unknown>): string {
+  const parts: string[] = [];
+  const encode = (value: string) =>
+    encodeURIComponent(value).replace(
+      /[!'()*]/g,
+      (char) => `%${char.charCodeAt(0).toString(16).toUpperCase()}`,
+    );
+
+  const append = (key: string, value: unknown) => {
+    if (value == null) return;
+
+    if (Array.isArray(value)) {
+      value.forEach((item) => append(key, item));
+      return;
+    }
+
+    if (typeof value === 'object') {
+      Object.entries(value).forEach(([childKey, childValue]) =>
+        append(`${key}[${childKey}]`, childValue),
+      );
+      return;
+    }
+
+    parts.push(`${encode(key)}=${encode(String(value))}`);
+  };
+
+  Object.entries(params).forEach(([key, value]) => append(key, value));
+
+  return parts.join('&');
+}
 
 const instance = axios.create({
   baseURL: '/api',
@@ -10,8 +41,7 @@ const instance = axios.create({
   responseType: 'json',
   validateStatus: (status) => status >= 200 && status < 300,
   paramsSerializer: {
-    serialize: (params) =>
-      stringify(params, { arrayFormat: 'repeat', skipNulls: true }),
+    serialize: serializeQuery,
   },
 });
 
