@@ -48,7 +48,7 @@ husky pre-commit 只跑 `pnpm lint`。CI 为 `.github/workflows/` 中的 Azure S
 - 主题半透明色请写成 `rgba(var(--v-theme-primary), 0.1)`；Vuetify 主题变量是逗号分隔的 RGB 三元组，`rgb(var(--v-theme-primary) / 0.1)` 无效。
 - 组件形态统一由 `src/plugins/vuetify/index.ts` 的 `defaults` 控制（卡片、按钮、输入框、列表、表格等），页面优先使用 Vuetify props 而不是手写 CSS；背景、边框、文字颜色使用主题令牌。
 - 全局类型见 `types/index.d.ts`：`ApiRes`、`TableReq`、`TableRes`、`RouteConfig`，以及通过模块增强扩展的 `RouteMeta`（`title` / `icon` / `keepAlive` / `hidden` / `permission` / `wrapName`）。
-- 异步数据用 `usePromiseFn`（`src/composables/index.ts`）返回 `{ loading, error, result, exec }`；失败会重新抛出，调用方需局部处理错误态。权限判断用 `usePermissions` / `hasPermissions`（`src/composables/auth.ts`）。
+- 异步数据用 `usePromiseFn`（`src/composables/usePromiseFn.ts`）返回 `{ loading, error, result, exec }`；失败会重新抛出，调用方需局部处理错误态。权限判断用 `usePermissions` / `checkPermission`（`src/composables/usePermissions.ts`）。
 - 列表页统一基于 `DataTable`：传入 `headers`（`DataTableHeader<T>[]`）、`params` 与 `load-data-fn`（参数 `TableReq`，返回 `TableRes<T>`），通过 `#search` / `#actions` / `#item.*` 插槽扩展。
 - 代码风格：Prettier `{ "singleQuote": true }`，2 空格，分号结尾；ESLint 由 `@vue/eslint-config-typescript` + `@vue/eslint-config-prettier` 决定，`no-console` 仅 warn。
 - UI 文案与注释使用中文；图标使用 Vuetify Material Design 图标名（如 `prepend-icon="person"`）。

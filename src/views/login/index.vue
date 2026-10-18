@@ -3,7 +3,7 @@ import type { VForm } from 'vuetify/components';
 import { useRules } from 'vuetify';
 import type { LoginReq } from '@/api/account';
 import { useAccountStore } from '@/store/modules/account';
-import { usePromiseFn } from '@/composables';
+import { usePromiseFn } from '@/composables/usePromiseFn';
 
 const appTitle = import.meta.env.VITE_APP_TITLE;
 const route = useRoute();

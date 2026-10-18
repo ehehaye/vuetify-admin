@@ -1,7 +1,7 @@
 import { pageComponentName } from '@/router/helper';
 import { useTagsViewStore } from '@/store/modules/tagsView';
 
-export const useKeepAliveInclude = () => {
+export function useKeepAliveInclude() {
   const { views } = storeToRefs(useTagsViewStore());
 
   return computed(() =>
@@ -9,4 +9,4 @@ export const useKeepAliveInclude = () => {
       .filter((view) => view.keepAlive)
       .map((view) => pageComponentName(view.path)),
   );
-};
+}

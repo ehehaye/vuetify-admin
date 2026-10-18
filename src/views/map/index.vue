@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useTimeoutFn } from '@vueuse/core';
 import { useSettingStore } from '@/store/modules/settings';
 
 const { isDark } = storeToRefs(useSettingStore());
@@ -7,20 +8,19 @@ const loading = ref(true);
 const failed = ref(false);
 const mapKey = ref(0);
 
-let timer: ReturnType<typeof setTimeout> | undefined;
-
-function startTimer() {
-  clearTimeout(timer);
-  timer = setTimeout(() => {
+const { start: startTimer, stop: stopTimer } = useTimeoutFn(
+  () => {
     if (loading.value) {
       loading.value = false;
       failed.value = true;
     }
-  }, 12000);
-}
+  },
+  12000,
+  { immediate: false },
+);
 
 function onComplete() {
-  clearTimeout(timer);
+  stopTimer();
   loading.value = false;
   failed.value = false;
 }
@@ -33,7 +33,6 @@ function retry() {
 }
 
 onMounted(startTimer);
-onBeforeUnmount(() => clearTimeout(timer));
 </script>
 
 <template>

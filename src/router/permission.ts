@@ -6,7 +6,7 @@ import {
   LOGIN_ROUTE,
   NOT_FOUND_ROUTE,
 } from '@/config/routes';
-import { hasPermissions } from '@/composables/auth';
+import { checkPermission } from '@/composables/usePermissions';
 
 router.beforeEach((to) => {
   NProgress.start();
@@ -28,7 +28,10 @@ router.beforeEach((to) => {
     return { path: DEFAULT_ROUTE_PATH, replace: true };
   }
 
-  if (to.meta.permission && !hasPermissions(to.meta.permission)) {
+  if (
+    to.meta.permission &&
+    !checkPermission(to.meta.permission, accountStore.permissions)
+  ) {
     return { path: NOT_FOUND_ROUTE.path, replace: true };
   }
 });

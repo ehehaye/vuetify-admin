@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useTheme } from 'vuetify';
 import { getDashboard } from '@/api/dashboard';
-import { usePromiseFn } from '@/composables';
+import { usePromiseFn } from '@/composables/usePromiseFn';
 import { useAccountStore } from '@/store/modules/account';
 import { useSettingStore } from '@/store/modules/settings';
 

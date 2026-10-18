@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useSettingStore } from '@/store/modules/settings';
-import { useKeepAliveInclude } from '@/composables/layout';
+import { useKeepAliveInclude } from '@/composables/useKeepAliveInclude';
 
 const route = useRoute();
 const { tagsView, headerHeight } = storeToRefs(useSettingStore());
