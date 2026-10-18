@@ -15,7 +15,7 @@ export const lazyImport = (path: string, wrapCompName?: string) => {
               id={wrapCompName}
               key={wrapCompName}
               v-keep-scroll
-              class="w-100 h-100 overflow-x-hidden overflow-y-auto"
+              class="tw:w-full tw:h-full tw:overflow-x-hidden tw:overflow-y-auto"
             >
               <Comp />
             </div>

@@ -24,7 +24,7 @@ const placeholderIcon = 'description';
       :activatable="false"
       active-strategy="leaf"
       color="primary"
-      class="pt-0"
+      class="tw:pt-0"
       :items
       item-title="name"
       item-props="meta"

@@ -74,7 +74,7 @@ defineExpose({ reset });
   <ImgInputer
     ref="imgInputerRef"
     v-model="file"
-    :class="{ 'elevation-0': flat }"
+    :class="{ 'tw:shadow-none': flat }"
     icon="img"
     accept="image/*"
     :img-src="imgSrc"
@@ -93,5 +93,3 @@ defineExpose({ reset });
     @on-change="handleFileChange"
   />
 </template>
-
-<style lang="scss"></style>

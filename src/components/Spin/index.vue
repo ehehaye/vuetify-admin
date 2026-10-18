@@ -1,6 +1,6 @@
 <template>
   <v-overlay
-    content-class="w-100 h-100 d-flex flex-row align-center justify-center"
+    content-class="tw:w-full tw:h-full tw:flex tw:flex-row tw:items-center tw:justify-center"
     contained
     attach
     :model-value="modelValue"
@@ -28,5 +28,3 @@ const bgColor = computed(() =>
   dark.value ? 'rgba(0, 0, 0, 0.7)' : 'rgba(255, 255, 255, 0.7)',
 );
 </script>
-
-<style></style>

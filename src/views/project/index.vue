@@ -82,15 +82,15 @@ const headers = computed(() => [
 </script>
 
 <template>
-  <div class="h-100 w-100 overflow-hidden">
+  <div class="tw:h-full tw:w-full tw:overflow-hidden">
     <DataTable
       ref="tableRef"
       :headers
       :load-data-fn="(options) => getProjects({ ...query, ...options })"
     >
       <template #search>
-        <v-row class="px-4">
-          <v-col class="py-0" cols="12">
+        <v-row class="tw:px-4">
+          <v-col class="tw:py-0" cols="12">
             <v-text-field
               ref="nameRef"
               v-model="query.name"
@@ -105,7 +105,11 @@ const headers = computed(() => [
 
       <template #actions>
         <AuthProvider :required="['project:add']">
-          <v-btn class="mr-2" variant="tonal" @click="projectSchemaRef.open()">
+          <v-btn
+            class="tw:mr-2"
+            variant="tonal"
+            @click="projectSchemaRef.open()"
+          >
             新增项目
           </v-btn>
         </AuthProvider>
@@ -146,5 +150,3 @@ const headers = computed(() => [
     />
   </div>
 </template>
-
-<style lang="scss"></style>

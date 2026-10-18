@@ -79,30 +79,22 @@ const submit = async () => {
       </template>
 
       <v-form
-        class="d-flex flex-column h-100"
+        class="tw:flex tw:flex-col tw:h-full"
         ref="formRef"
         @submit.prevent="submit"
       >
-        <v-card :flat="flat" class="overflow-y-auto flex-1-0">
-          <v-card-text class="flex-grow-1">
+        <v-card :flat="flat" class="tw:overflow-y-auto tw:flex-1">
+          <v-card-text class="tw:grow">
             <slot name="content" />
           </v-card-text>
         </v-card>
 
         <Spin :model-value="loading" />
         <v-divider />
-        <div class="w-100 d-flex flex-row">
+        <div class="tw:w-full tw:flex tw:flex-row">
           <slot name="actions" />
         </div>
       </v-form>
     </v-navigation-drawer>
   </Teleport>
 </template>
-
-<style lang="scss">
-.FormWrapper {
-  .v-navigation-drawer__content {
-    flex: 1;
-  }
-}
-</style>

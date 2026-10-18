@@ -22,11 +22,14 @@ const submit = async () => {
 </script>
 
 <template>
-  <v-container class="d-flex h-100 align-center justify-center" fluid>
-    <v-row class="full-height align-center justify-center">
+  <v-container
+    class="tw:flex tw:h-full tw:items-center tw:justify-center"
+    fluid
+  >
+    <v-row class="tw:h-full tw:items-center tw:justify-center">
       <v-col cols="12" sm="8" md="4">
         <v-form ref="formRef" @submit.prevent="submit">
-          <v-card class="elevation-4">
+          <v-card class="tw:shadow-lg">
             <v-toolbar color="primary" dark flat>
               <v-toolbar-title>用户登录</v-toolbar-title>
               <v-spacer />
@@ -71,5 +74,3 @@ const submit = async () => {
     </v-row>
   </v-container>
 </template>
-
-<style lang="scss"></style>

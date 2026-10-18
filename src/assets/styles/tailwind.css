@@ -1,0 +1,61 @@
+@layer theme, base, components, utilities, app-overrides;
+
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+
+@custom-variant dark (&:where(
+  [class*='v-theme--'][class*='_dark'],
+  [class*='v-theme--'][class*='_dark'] *
+));
+
+/* prefix(tw)：所有 Tailwind 工具类必须写成 tw:*，避免与 Vuetify 原子类冲突 */
+@theme inline prefix(tw) {
+  --font-sans: var(--v-font-body, 'Roboto', sans-serif);
+
+  --color-primary: rgb(var(--v-theme-primary));
+  --color-on-primary: rgb(var(--v-theme-on-primary));
+  --color-primary-lighten-1: rgb(var(--v-theme-primary-lighten-1));
+  --color-primary-darken-1: rgb(var(--v-theme-primary-darken-1));
+  --color-primary-darken-2: rgb(var(--v-theme-primary-darken-2));
+  --color-secondary: rgb(var(--v-theme-secondary));
+  --color-on-secondary: rgb(var(--v-theme-on-secondary));
+
+  --color-surface: rgb(var(--v-theme-surface));
+  --color-on-surface: rgb(var(--v-theme-on-surface));
+  --color-surface-light: rgb(var(--v-theme-surface-light));
+  --color-surface-variant: rgb(var(--v-theme-surface-variant));
+  --color-on-surface-variant: rgb(var(--v-theme-on-surface-variant));
+  --color-background: rgb(var(--v-theme-background));
+  --color-on-background: rgb(var(--v-theme-on-background));
+
+  --color-error: rgb(var(--v-theme-error));
+  --color-on-error: rgb(var(--v-theme-on-error));
+  --color-info: rgb(var(--v-theme-info));
+  --color-success: rgb(var(--v-theme-success));
+  --color-warning: rgb(var(--v-theme-warning));
+
+  --breakpoint-sm: 600px;
+  --breakpoint-md: 960px;
+  --breakpoint-lg: 1280px;
+  --breakpoint-xl: 1920px;
+  --breakpoint-2xl: 2560px;
+}
+
+@layer app-overrides {
+  html {
+    overflow-y: auto;
+  }
+
+  .FormWrapper .v-navigation-drawer__content {
+    flex: 1;
+  }
+
+  .toast .v-snack {
+    position: fixed;
+    z-index: 9;
+  }
+
+  .data-table .v-table--fixed-header thead tr {
+    background-color: rgb(var(--v-theme-background));
+  }
+}

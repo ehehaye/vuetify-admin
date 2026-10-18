@@ -39,7 +39,7 @@ const range = computed(() => {
     </div>
 
     <v-select
-      class="flex-0-1"
+      class="tw:flex-initial tw:min-w-[100px]"
       density="compact"
       hide-details
       :items="[
@@ -53,7 +53,7 @@ const range = computed(() => {
       v-model:model-value="options.itemsPerPage"
     ></v-select>
 
-    <div class="v-data-table-footer__info">
+    <div class="v-data-table-footer__info tw:min-w-[125px]">
       <span>{{ range }} 共 {{ result.total }}</span>
     </div>
 
@@ -74,13 +74,3 @@ const range = computed(() => {
     </div>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.v-select {
-  min-width: 100px;
-}
-
-.v-data-table-footer__info {
-  min-width: 125px;
-}
-</style>

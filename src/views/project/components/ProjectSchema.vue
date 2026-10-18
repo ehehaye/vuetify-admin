@@ -165,7 +165,7 @@ defineExpose({ open });
           </v-col>
         </v-row>
         <v-row>
-          <v-col class="py-0" cols="12">
+          <v-col class="tw:py-0" cols="12">
             <v-text-field
               v-model="model.tags"
               variant="underlined"
@@ -193,5 +193,3 @@ defineExpose({ open });
     </template>
   </FormDrawer>
 </template>
-
-<style lang="scss"></style>

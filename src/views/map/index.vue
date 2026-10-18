@@ -8,7 +8,7 @@ const loading = ref(true);
 </script>
 
 <template>
-  <div class="map">
+  <div class="tw:relative tw:h-full tw:w-full">
     <Spin :model-value="loading">
       <AMapMap
         :map-style="dark ? 'dark' : 'normal'"
@@ -22,11 +22,3 @@ const loading = ref(true);
     </Spin>
   </div>
 </template>
-
-<style lang="scss">
-.map {
-  position: relative;
-  height: 100%;
-  width: 100%;
-}
-</style>

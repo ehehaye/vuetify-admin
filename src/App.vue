@@ -1,5 +1,5 @@
 <template>
-  <v-app id="v-application" class="w-100 h-screen p-relative">
+  <v-app id="v-application" class="tw:w-full tw:h-screen tw:relative">
     <router-view v-slot="{ Component }">
       <v-fade-transition leave-absolute mode="out-in">
         <component :is="Component" @vue:mounted="removeSpinner" />

@@ -7,6 +7,7 @@ import path from 'node:path';
 import eslint from 'vite-plugin-eslint';
 import { codeInspectorPlugin } from 'code-inspector-plugin';
 import vueJsx from '@vitejs/plugin-vue-jsx';
+import tailwindcss from '@tailwindcss/vite';
 import Components from 'unplugin-vue-components/vite';
 import AutoImport from 'unplugin-auto-import/vite';
 
@@ -30,6 +31,7 @@ export default defineConfig(({ mode }) => {
       vuetify({
         autoImport: { labs: true },
       }),
+      tailwindcss(),
       Components({
         globs: ['src/components/**/index.vue'],
         dts: './types/components.d.ts',

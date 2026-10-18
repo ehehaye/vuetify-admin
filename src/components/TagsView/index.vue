@@ -25,7 +25,7 @@ const ctxMenu = (e: MouseEvent, index: number) => {
 </script>
 
 <template>
-  <div class="w-100">
+  <div class="tw:w-full">
     <v-tabs
       :model-value="route.fullPath"
       show-arrows
@@ -67,5 +67,3 @@ const ctxMenu = (e: MouseEvent, index: number) => {
     </FollowMenu>
   </div>
 </template>
-
-<style lang="scss"></style>

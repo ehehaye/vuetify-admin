@@ -13,5 +13,3 @@ defineOptions({ name: 'Exception' });
     min-height="80%"
   ></v-empty-state>
 </template>
-
-<style lang="scss"></style>

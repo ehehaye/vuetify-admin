@@ -78,12 +78,3 @@ onBeforeUnmount(() => {
     </v-fade-transition>
   </div>
 </template>
-
-<style lang="scss">
-.toast {
-  .v-snack {
-    position: fixed;
-    z-index: 9;
-  }
-}
-</style>

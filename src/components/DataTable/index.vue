@@ -65,22 +65,26 @@ defineExpose({ refresh });
 </script>
 
 <template>
-  <div class="data-table w-100 h-100 d-flex flex-column">
-    <v-form class="mt-4 mb-4" ref="formRef" @submit.prevent="refresh(true)">
+  <div class="data-table tw:w-full tw:h-full tw:flex tw:flex-col">
+    <v-form
+      class="tw:mt-4 tw:mb-4"
+      ref="formRef"
+      @submit.prevent="refresh(true)"
+    >
       <slot name="search" />
 
-      <div class="d-flex flex-row pb-1 px-2">
+      <div class="tw:flex tw:flex-row tw:pb-1 tw:px-2">
         <slot name="actions" />
         <v-spacer />
-        <v-btn class="mr-2" variant="tonal" type="submit"> 查询 </v-btn>
+        <v-btn class="tw:mr-2" variant="tonal" type="submit"> 查询 </v-btn>
         <v-btn variant="tonal" @click="refresh()"> 刷新 </v-btn>
       </div>
     </v-form>
 
-    <div class="flex-grow-1 overflow-hidden">
+    <div class="tw:grow tw:overflow-hidden">
       <v-data-table-virtual
         v-keep-scroll="['.v-table__wrapper']"
-        class="elevation-0 w-100 h-100 d-flex flex-column overflow-x-hidden"
+        class="tw:shadow-none tw:w-full tw:h-full tw:flex tw:flex-col tw:overflow-x-hidden"
         fixed-header
         fixed-footer
         :headers
@@ -103,11 +107,3 @@ defineExpose({ refresh });
     </div>
   </div>
 </template>
-
-<style lang="scss">
-.data-table {
-  .v-table--fixed-header thead tr {
-    background-color: rgb(var(--v-theme-background));
-  }
-}
-</style>

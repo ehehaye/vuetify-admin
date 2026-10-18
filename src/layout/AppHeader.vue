@@ -23,7 +23,7 @@ const repo = import.meta.env.VITE_GITHUB_REPO;
   <v-app-bar
     :clipped-left="permanentNavigation || lgAndUp"
     app
-    class="pr-4"
+    class="tw:pr-4"
     color="primary darken-2"
     dark
     flat
